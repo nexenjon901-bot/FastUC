@@ -18,8 +18,8 @@ const queryClient = new QueryClient();
 
 const App: React.FC = () => {
   useEffect(() => {
-    WebApp.ready();
-    WebApp.expand();
+    if (WebApp.ready) WebApp.ready();
+    if (WebApp.expand) WebApp.expand();
 
     // Set language from Telegram
     const lang = WebApp.initDataUnsafe?.user?.language_code || 'uz';

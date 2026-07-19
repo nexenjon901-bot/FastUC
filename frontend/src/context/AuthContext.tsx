@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const authenticate = async () => {
       try {
-        WebApp.ready();
+        if (WebApp.ready) WebApp.ready();
         const initData = WebApp.initData;
 
         // For development: if no initData, use stored token
