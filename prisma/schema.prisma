@@ -1,0 +1,198 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(uuid())
+  telegramId    String    @unique
+  username      String?
+  firstName     String?
+  balance       Decimal   @default(0) @db.Decimal(10, 2)
+  createdAt     DateTime  @default(now())
+  isBlocked     Boolean   @default(false)
+  lastLoginAt   DateTime?
+  languageCode  String    @default("uz")
+  
+  orders        Order[]
+  transactions  Transaction[]
+  topUpRequests TopUpRequest[]
+}
+
+model Account {
+  id               String       @id @default(uuid())
+  sku              String       @unique // e.g. "PG-4471"
+  title            String
+  rank             String
+  level            Int
+  skinsCount       Int
+  ucBalance        Int
+  price            Decimal      @db.Decimal(10, 2)
+  status           AccountStatus @default(AVAILABLE)
+  description      String?      @db.Text
+  images           String[]     // S3 urls
+  createdByAdminId String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  credential       AccountCredential?
+  orders           Order[]
+}
+
+enum AccountStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  HIDDEN
+}
+
+model AccountCredential {
+  id                   String    @id @default(uuid())
+  accountId            String    @unique
+  account              Account   @relation(fields: [accountId], references: [id])
+  encryptedLogin       String
+  encryptedPassword    String
+  encryptionKeyVersion String
+  revealedAt           DateTime?
+  revealedToOrderId    String?
+}
+
+model Order {
+  id            String       @id @default(uuid())
+  orderNumber   String       @unique
+  buyerId       String
+  buyer         User         @relation(fields: [buyerId], references: [id])
+  accountId     String
+  account       Account      @relation(fields: [accountId], references: [id])
+  amount        Decimal      @db.Decimal(10, 2)
+  status        OrderStatus  @default(PENDING_PAYMENT)
+  escrowStep    Int          @default(0) // 0-3
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  confirmedAt   DateTime?
+
+  disputes      Dispute[]
+  transactions  Transaction[]
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  ESCROW_HELD
+  ADMIN_REVIEW
+  CREDENTIALS_SENT
+  BUYER_CONFIRMED
+  COMPLETED
+  DISPUTED
+  CANCELLED
+  REFUNDED
+}
+
+model Transaction {
+  id                    String            @id @default(uuid())
+  userId                String
+  user                  User              @relation(fields: [userId], references: [id])
+  type                  TransactionType
+  amount                Decimal           @db.Decimal(10, 2)
+  balanceAfter          Decimal           @db.Decimal(10, 2)
+  orderId               String?
+  order                 Order?            @relation(fields: [orderId], references: [id])
+  paymentProvider       PaymentProvider?
+  providerTransactionId String?           @unique
+  status                TransactionStatus @default(COMPLETED)
+  createdAt             DateTime          @default(now())
+}
+
+enum TransactionType {
+  TOPUP
+  ESCROW_HOLD
+  ESCROW_RELEASE
+  REFUND
+  ADMIN_ADJUST
+}
+
+enum PaymentProvider {
+  MANUAL
+  CLICK
+  PAYME
+  UZCARD_HUMO
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model AdminUser {
+  id                  String     @id @default(uuid())
+  email               String     @unique
+  passwordHash        String
+  totpSecret          String
+  role                AdminRole  @default(MODERATOR)
+  isActive            Boolean    @default(true)
+  lastLoginAt         DateTime?
+  failedLoginAttempts Int        @default(0)
+  lockedUntil         DateTime?
+}
+
+enum AdminRole {
+  SUPERADMIN
+  MODERATOR
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorType   String   // ADMIN, SYSTEM, USER
+  actorId     String
+  action      String
+  targetType  String?
+  targetId    String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+}
+
+model Dispute {
+  id               String        @id @default(uuid())
+  orderId          String
+  order            Order         @relation(fields: [orderId], references: [id])
+  openedBy         String
+  reason           String        @db.Text
+  status           DisputeStatus @default(OPEN)
+  resolutionNote   String?       @db.Text
+  resolvedByAdminId String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+enum DisputeStatus {
+  OPEN
+  RESOLVED
+  REJECTED
+}
+
+model TopUpRequest {
+  id               String          @id @default(uuid())
+  userId           String
+  user             User            @relation(fields: [userId], references: [id])
+  amount           Decimal         @db.Decimal(10, 2)
+  method           PaymentProvider
+  proofImageUrl    String
+  userComment      String?
+  status           TopUpStatus     @default(PENDING)
+  reviewedByAdminId String?
+  reviewedAt       DateTime?
+  rejectionReason  String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+enum TopUpStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

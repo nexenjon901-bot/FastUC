@@ -1,0 +1,73 @@
+{
+  "home": {
+    "title": "Аккаунты PUBG",
+    "search": "Поиск...",
+    "filter": "Фильтр",
+    "escrowBanner": "Безопасная покупка с защитой Escrow",
+    "buy": "Купить безопасно",
+    "noAccounts": "Аккаунты не найдены"
+  },
+  "account": {
+    "rank": "Ранг",
+    "level": "Уровень",
+    "skins": "Скины",
+    "uc": "Баланс UC",
+    "buyNow": "Купить безопасно",
+    "description": "Описание",
+    "escrowProtected": "Защищено Escrow"
+  },
+  "balance": {
+    "title": "Баланс",
+    "currentBalance": "Текущий баланс",
+    "topUp": "Пополнить счёт",
+    "method": "Способ оплаты",
+    "amount": "Сумма (UZS)",
+    "amountPlaceholder": "Введите сумму",
+    "proofImage": "URL чека/скрина",
+    "proofPlaceholder": "Введите URL чека",
+    "submit": "Отправить запрос",
+    "pending": "Ожидание",
+    "approved": "Подтверждено",
+    "rejected": "Отклонено"
+  },
+  "orders": {
+    "title": "Заказы",
+    "status": {
+      "PENDING_PAYMENT": "Ожидание оплаты",
+      "ESCROW_HELD": "В Escrow",
+      "ADMIN_REVIEW": "Проверка администратором",
+      "CREDENTIALS_SENT": "Данные отправлены",
+      "BUYER_CONFIRMED": "Подтверждено",
+      "COMPLETED": "Завершено",
+      "DISPUTED": "Спор",
+      "CANCELLED": "Отменено",
+      "REFUNDED": "Возврат"
+    },
+    "confirm": "Подтвердить получение",
+    "dispute": "Есть проблема",
+    "empty": "Нет заказов"
+  },
+  "profile": {
+    "title": "Профиль",
+    "id": "ID",
+    "balance": "Баланс",
+    "totalOrders": "Всего заказов",
+    "language": "Язык",
+    "logout": "Выход"
+  },
+  "escrow": {
+    "title": "Процесс Escrow",
+    "step1": "Оплата принята",
+    "step2": "Администратор проверяет",
+    "step3": "Данные отправлены",
+    "step4": "Покупатель подтвердил",
+    "credentialsTitle": "Данные аккаунта",
+    "credentialsWarning": "Эти данные будут скрыты через 60 секунд!"
+  },
+  "nav": {
+    "home": "Главная",
+    "balance": "Баланс",
+    "orders": "История",
+    "profile": "Профиль"
+  }
+}

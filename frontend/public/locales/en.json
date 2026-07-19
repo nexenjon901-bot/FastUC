@@ -1,0 +1,73 @@
+{
+  "home": {
+    "title": "PUBG Accounts",
+    "search": "Search...",
+    "filter": "Filter",
+    "escrowBanner": "Safe purchase with Escrow protection",
+    "buy": "Buy Safely",
+    "noAccounts": "No accounts found"
+  },
+  "account": {
+    "rank": "Rank",
+    "level": "Level",
+    "skins": "Skins",
+    "uc": "UC Balance",
+    "buyNow": "Buy Safely",
+    "description": "Description",
+    "escrowProtected": "Protected by Escrow"
+  },
+  "balance": {
+    "title": "Balance",
+    "currentBalance": "Current Balance",
+    "topUp": "Top Up Account",
+    "method": "Payment Method",
+    "amount": "Amount (UZS)",
+    "amountPlaceholder": "Enter amount",
+    "proofImage": "Receipt/screenshot URL",
+    "proofPlaceholder": "Enter receipt URL",
+    "submit": "Submit Request",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "orders": {
+    "title": "Orders",
+    "status": {
+      "PENDING_PAYMENT": "Awaiting Payment",
+      "ESCROW_HELD": "In Escrow",
+      "ADMIN_REVIEW": "Admin Reviewing",
+      "CREDENTIALS_SENT": "Credentials Sent",
+      "BUYER_CONFIRMED": "Confirmed",
+      "COMPLETED": "Completed",
+      "DISPUTED": "Disputed",
+      "CANCELLED": "Cancelled",
+      "REFUNDED": "Refunded"
+    },
+    "confirm": "I Received It",
+    "dispute": "There's a Problem",
+    "empty": "No orders yet"
+  },
+  "profile": {
+    "title": "Profile",
+    "id": "ID",
+    "balance": "Balance",
+    "totalOrders": "Total Orders",
+    "language": "Language",
+    "logout": "Logout"
+  },
+  "escrow": {
+    "title": "Escrow Process",
+    "step1": "Payment Received",
+    "step2": "Admin Reviewing",
+    "step3": "Credentials Sent",
+    "step4": "Buyer Confirmed",
+    "credentialsTitle": "Account Credentials",
+    "credentialsWarning": "These credentials will be hidden in 60 seconds!"
+  },
+  "nav": {
+    "home": "Home",
+    "balance": "Balance",
+    "orders": "History",
+    "profile": "Profile"
+  }
+}
