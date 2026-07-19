@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import Header from '../components/Header';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,20 +17,9 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="page-container" style={{ padding: 0 }}>
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-bg">
-        <div className="w-10 h-10 rounded-full bg-[#d946ef] flex items-center justify-center text-white font-bold text-lg shadow-lg">
-          H
-        </div>
-        <button className="flex items-center gap-2 border border-white/20 rounded-xl px-4 py-1.5 text-white text-sm font-medium hover:bg-white/5 transition-colors">
-          <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Fikrlar
-        </button>
-      </div>
+      <Header balance={balance} />
 
-      <div className="px-4 pb-24 mt-2">
+      <div className="px-4 pb-24 mt-4">
         {/* Balance Card */}
         <div className="bg-[#242746] rounded-2xl p-5 flex items-center justify-between mb-6 shadow-lg border border-white/5">
           <div className="flex items-center gap-3">

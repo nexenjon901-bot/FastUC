@@ -1,98 +1,103 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import WebApp from '@twa-dev/sdk';
-import { initI18n } from '../i18n';
-
-const LANGUAGES = [
-  { code: 'uz', label: "O'zbek", flag: '🇺🇿' },
-  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-];
+import React, { useState, useEffect } from 'react';
+import Header from '../components/Header';
+import api from '../api';
 
 const ProfilePage: React.FC = () => {
-  const { t, i18n } = useTranslation();
-  const [showLangPicker, setShowLangPicker] = useState(false);
+  const [balance, setBalance] = useState<number>(0);
 
-  const tgUser = WebApp.initDataUnsafe?.user;
-
-  const handleLangChange = async (code: string) => {
-    await initI18n(code);
-    setShowLangPicker(false);
-  };
-
-  const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
+  useEffect(() => {
+    api.get('/users/me')
+      .then(res => setBalance(res.data.balance || 0))
+      .catch(() => {});
+  }, []);
 
   return (
-    <div className="page-container">
-      <h1 className="section-title">{t('profile.title')}</h1>
+    <div className="page-container flex flex-col" style={{ padding: 0 }}>
+      <Header balance={balance} />
 
-      {/* Avatar & Name */}
-      <div className="card mb-4 flex items-center gap-4 animate-fade-in-up">
-        <div className="w-16 h-16 rounded-2xl bg-accent-gradient flex items-center justify-center text-white text-2xl font-extrabold flex-shrink-0">
-          {tgUser?.first_name?.[0] || '?'}
-        </div>
-        <div>
-          <p className="text-primary font-extrabold text-lg">
-            {tgUser?.first_name || 'Foydalanuvchi'} {tgUser?.last_name || ''}
-          </p>
-          {tgUser?.username && (
-            <p className="text-secondary text-sm">@{tgUser.username}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="card text-center animate-fade-in-up">
-          <p className="text-secondary text-xs mb-1">{t('profile.id')}</p>
-          <code className="text-primary font-mono text-sm font-bold">{tgUser?.id || '—'}</code>
-        </div>
-        <div className="card text-center animate-fade-in-up" style={{ animationDelay: '60ms' }}>
-          <p className="text-secondary text-xs mb-1">{t('profile.balance')}</p>
-          <p className="text-gradient font-extrabold">0 UZS</p>
-        </div>
-      </div>
-
-      {/* Language */}
-      <div className="card mb-4 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-secondary text-xs mb-1">{t('profile.language')}</p>
-            <p className="text-primary font-bold flex items-center gap-2">
-              <span>{currentLang.flag}</span>
-              <span>{currentLang.label}</span>
-            </p>
+      <div className="px-4 py-8 flex flex-col items-center">
+        {/* Large Avatar */}
+        <div className="relative mb-4 mt-[-20px]">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#d946ef] to-[#c026d3] shadow-[0_0_30px_rgba(217,70,239,0.4)] flex items-center justify-center text-white text-3xl font-bold">
+            {/* The user avatar from Telegram, fallback to H */}
+            Hn
           </div>
-          <button
-            id="change-lang-btn"
-            onClick={() => setShowLangPicker(!showLangPicker)}
-            className="badge-info cursor-pointer"
-          >
-            O'zgartirish
-          </button>
+          <div className="absolute bottom-1 right-1 w-5 h-5 bg-[#10b981] border-4 border-[#1b1d36] rounded-full"></div>
         </div>
 
-        {showLangPicker && (
-          <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-3 gap-2">
-            {LANGUAGES.map(lang => (
-              <button
-                key={lang.code}
-                id={`lang-${lang.code}`}
-                onClick={() => handleLangChange(lang.code)}
-                className={`py-2 rounded-xl text-sm font-semibold border transition-all duration-200 ${i18n.language === lang.code ? 'border-accent-indigo bg-accent-indigo/10 text-accent-indigo' : 'border-white/10 text-secondary'}`}
-              >
-                {lang.flag} {lang.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+        {/* Name and ID */}
+        <h1 className="text-3xl font-black text-white mb-2">Hn</h1>
+        <div className="px-4 py-1.5 bg-[#242746] border border-[#6366f1]/30 rounded-full mb-8 flex items-center justify-center">
+          <span className="text-indigo-300 font-medium text-sm">ID: 8407085035</span>
+        </div>
 
-      {/* App info */}
-      <div className="card text-center animate-fade-in-up" style={{ animationDelay: '180ms' }}>
-        <p className="text-gradient font-extrabold text-lg mb-1">FastPAY</p>
-        <p className="text-secondary text-xs">v1.0.0 · PUBG Account Marketplace</p>
-        <p className="text-secondary text-xs mt-1">🛡️ Escrow himoyasi bilan xavfsiz xarid</p>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 gap-4 w-full mb-8">
+          <div className="bg-[#242746] rounded-3xl p-5 flex flex-col items-center justify-center border border-white/5 shadow-lg">
+            <div className="w-12 h-12 bg-[#1c1d33] rounded-2xl flex items-center justify-center mb-4 text-indigo-400">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <p className="text-[#94a3b8] text-[10px] font-bold tracking-wider mb-2 text-center h-8 flex items-center">BAJARILGAN<br/>BUYURTMALAR</p>
+            <h2 className="text-2xl font-black text-white">0</h2>
+          </div>
+          
+          <div className="bg-[#242746] rounded-3xl p-5 flex flex-col items-center justify-center border border-white/5 shadow-lg">
+            <div className="w-12 h-12 bg-[#1c1d33] rounded-2xl flex items-center justify-center mb-4 text-indigo-400">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
+                <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <p className="text-[#94a3b8] text-[10px] font-bold tracking-wider mb-2 text-center h-8 flex items-center">RO'YXATDAN<br/>O'TGAN</p>
+            <h2 className="text-lg font-black text-white">19.07.2026</h2>
+          </div>
+        </div>
+
+        {/* Menu List */}
+        <div className="w-full bg-[#242746] rounded-3xl border border-white/5 shadow-lg overflow-hidden flex flex-col">
+          {/* Item 1 */}
+          <div className="flex items-center justify-between p-5 border-b border-white/5 cursor-pointer hover:bg-[#2c3053] transition-colors">
+            <div className="flex items-center gap-4">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="text-indigo-400">
+                <path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 8h2a2 2 0 100-4h-2M2 9.424A11.966 11.966 0 0012 17.5a11.966 11.966 0 0010-8.076M2 9.424A11.966 11.966 0 0112 1.348a11.966 11.966 0 0110 8.076M2 9.424h20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-white font-bold text-lg">Yangiliklar kanali</span>
+            </div>
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className="text-white/30">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          
+          {/* Item 2 */}
+          <div className="flex items-center justify-between p-5 border-b border-white/5 cursor-pointer hover:bg-[#2c3053] transition-colors">
+            <div className="flex items-center gap-4">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="text-white/60">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-white font-bold text-lg">Qo'llab-Quvvatlash</span>
+            </div>
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className="text-white/30">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+
+          {/* Item 3 */}
+          <div className="flex items-center justify-between p-5 cursor-pointer hover:bg-[#2c3053] transition-colors">
+            <div className="flex items-center gap-4">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="text-white/60">
+                <path d="M9 12h6M9 16h6M19 8.5V20a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2h6.5L19 8.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-white font-bold text-lg">Ommaviy oferta</span>
+            </div>
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className="text-white/30">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
       </div>
     </div>
   );
