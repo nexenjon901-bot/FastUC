@@ -8,6 +8,7 @@ import './index.css';
 
 import BottomNav from './components/BottomNav';
 import HomePage from './pages/HomePage';
+import AccountsPage from './pages/AccountsPage';
 import AccountDetailPage from './pages/AccountDetailPage';
 import BalancePage from './pages/BalancePage';
 import OrdersPage from './pages/OrdersPage';
@@ -39,6 +40,7 @@ const App: React.FC = () => {
             }>
               <Routes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/accounts" element={<AccountsPage />} />
                 <Route path="/accounts/:id" element={<AccountDetailPage />} />
                 <Route path="/balance" element={<BalancePage />} />
                 <Route path="/orders" element={<OrdersPage />} />
