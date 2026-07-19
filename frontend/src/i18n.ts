@@ -6,7 +6,7 @@ i18n.use(initReactI18next).init({
   fallbackLng: 'uz',
   resources: {},
   interpolation: { escapeValue: false },
-  backend: { loadPath: '/locales/{{lng}}.json' },
+  react: { useSuspense: false },
 });
 
 // Dynamically load locale files
