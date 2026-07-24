@@ -237,7 +237,7 @@ const AdminPage: React.FC = () => {
 
   // MAIN ADMIN PANEL
   return (
-    <div className="min-h-screen bg-[#080a18] text-white" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen bg-[#080a18] text-white">
       {/* Top Header */}
       <div className="sticky top-0 z-40 bg-[#0d0f1e]/90 backdrop-blur-xl border-b border-white/5 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
