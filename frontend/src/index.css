@@ -35,6 +35,7 @@
     background-color: #12132b;
     color: #ffffff;
     font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 15px;
   }
 
   ::-webkit-scrollbar { width: 4px; }

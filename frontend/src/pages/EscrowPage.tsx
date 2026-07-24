@@ -181,6 +181,18 @@ const EscrowPage: React.FC = () => {
         </div>
       )}
 
+      {order.status === 'ESCROW_HELD' && (
+        <div className="card border border-[#6366f1]/30 bg-[#6366f1]/10 text-center py-6 mb-4 animate-fade-in-up">
+          <div className="w-12 h-12 rounded-full bg-[#6366f1]/20 flex items-center justify-center mx-auto mb-3">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+              <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <p className="text-white font-bold mb-1">Xarid muvaffaqiyatli!</p>
+          <p className="text-[#a5b4fc] text-sm">Admin akkaunt ma'lumotlarini 5 daqiqa ichida yuboradi. Iltimos, kuting.</p>
+        </div>
+      )}
+
       {order.status === 'DISPUTED' && (
         <div className="card border border-warning/30 text-center py-6 mb-4">
           <p className="text-warning font-bold">Nizo ochilgan — admin ko&apos;rib chiqmoqda</p>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Wallet, History, User } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const BottomNav: React.FC = () => {
   const navigate = useNavigate();
@@ -39,14 +40,40 @@ const BottomNav: React.FC = () => {
           <button
             key={tab.path}
             onClick={() => navigate(tab.path)}
-            className={`nav-item ${active ? 'active' : ''}`}
+            className={`nav-item relative ${active ? 'active' : ''}`}
           >
-            <Icon 
-              size={22} 
-              strokeWidth={active ? 2.5 : 2} 
-              className="transition-all duration-300"
-            />
-            <span>{tab.label}</span>
+            <motion.div
+              initial={false}
+              animate={{ 
+                scale: active ? 1.15 : 1, 
+                y: active ? -4 : 0 
+              }}
+              transition={{
+                type: 'spring',
+                stiffness: 400,
+                damping: 17,
+                mass: 0.8
+              }}
+            >
+              <Icon 
+                size={24} 
+                strokeWidth={active ? 2.5 : 2} 
+                className={active ? 'text-[#3b82f6]' : 'text-[#8b92b8]'}
+                style={active ? { filter: 'drop-shadow(0 4px 12px rgba(59, 130, 246, 0.5))' } : {}}
+              />
+            </motion.div>
+            <motion.span
+              initial={false}
+              animate={{ 
+                opacity: active ? 1 : 0.7,
+                scale: active ? 1 : 0.9,
+                y: active ? 2 : 0
+              }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              className={`text-[0.65rem] font-bold ${active ? 'text-white' : 'text-[#8b92b8]'}`}
+            >
+              {tab.label}
+            </motion.span>
           </button>
         );
       })}

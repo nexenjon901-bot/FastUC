@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import api from '../api';
 import { useAuth } from '../context/AuthContext';
-import { CreditCard, Copy, CheckCircle2, ChevronLeft, Wifi } from 'lucide-react';
+import { CreditCard, Copy, CheckCircle2, ChevronLeft, Wifi, Hourglass } from 'lucide-react';
 
 type Step = 'method' | 'amount' | 'card' | 'done';
 
@@ -17,15 +17,16 @@ const ADMIN_CARD: CardInfo = {
   holder: 'FASTPAY ADMIN',
 };
 
-const PAYMENT_DURATION = 15 * 60;
+const PAYMENT_DURATION = 10 * 60;
 
 const BalancePage: React.FC = () => {
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const { user, photoUrl, refreshUser } = useAuth();
   const [balance, setBalance] = useState(0);
   const [step, setStep] = useState<Step>('method');
   const [method, setMethod] = useState<'UZCARD_HUMO' | 'MANUAL'>('UZCARD_HUMO');
   const [amount, setAmount] = useState('');
+  const [receiptUrl, setReceiptUrl] = useState('');
   const [timeLeft, setTimeLeft] = useState(PAYMENT_DURATION);
   const [copied, setCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -33,8 +34,10 @@ const BalancePage: React.FC = () => {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    api.get('/users/me').then((r) => setBalance(Number(r.data?.balance) || 0)).catch(() => {});
-  }, []);
+    if (user?.balance) {
+      setBalance(Number(user.balance));
+    }
+  }, [user]);
 
   useEffect(() => {
     if (step === 'card') {
@@ -55,9 +58,7 @@ const BalancePage: React.FC = () => {
     };
   }, [step]);
 
-  const minutes = Math.floor(timeLeft / 60)
-    .toString()
-    .padStart(2, '0');
+  const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
   const seconds = (timeLeft % 60).toString().padStart(2, '0');
 
   const copyCard = () => {
@@ -67,6 +68,11 @@ const BalancePage: React.FC = () => {
   };
 
   const submitTopup = async () => {
+    if (!receiptUrl.trim()) {
+      setError('Iltimos, to‘lov cheki ssilkasini kiriting!');
+      return;
+    }
+
     setSubmitting(true);
     setError('');
     try {
@@ -74,7 +80,7 @@ const BalancePage: React.FC = () => {
         amount: Number(amount),
         method,
         userComment: `Manual transfer ${Number(amount).toLocaleString()} UZS`,
-        proofImageUrl: null,
+        proofImageUrl: receiptUrl,
       });
       await refreshUser();
       setStep('done');
@@ -93,7 +99,7 @@ const BalancePage: React.FC = () => {
   if (step === 'done') {
     return (
       <div className="page-container" style={{ paddingBottom: 0 }}>
-        <Header balance={balance} />
+        <Header balance={balance} userName={user?.firstName || 'U'} photoUrl={photoUrl} />
         <div className="px-4 py-10 pb-24 text-center">
           <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
             <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
@@ -102,7 +108,7 @@ const BalancePage: React.FC = () => {
           </div>
           <h1 className="text-2xl font-black text-white mb-2">So‘rov yuborildi</h1>
           <p className="text-[#8b92b8] mb-6">
-            {Number(amount).toLocaleString()} UZS — admin tasdiqlagach balansingiz to‘ldiriladi.
+            {Number(amount).toLocaleString()} UZS — admin chekni tasdiqlagach balansingiz to‘ldiriladi.
           </p>
           <button onClick={() => navigate('/')} className="btn-primary">
             Bosh sahifa
@@ -115,7 +121,7 @@ const BalancePage: React.FC = () => {
   if (step === 'method') {
     return (
       <div className="page-container" style={{ paddingBottom: 0 }}>
-        <Header balance={balance} />
+        <Header balance={balance} userName={user?.firstName || 'U'} photoUrl={photoUrl} />
         <div className="px-4 py-4 pb-24">
           <button
             onClick={() => navigate(-1)}
@@ -153,7 +159,7 @@ const BalancePage: React.FC = () => {
   if (step === 'amount') {
     return (
       <div className="page-container" style={{ paddingBottom: 0 }}>
-        <Header balance={balance} />
+        <Header balance={balance} userName={user?.firstName || 'U'} photoUrl={photoUrl} />
         <div className="px-4 py-4 pb-24">
           <button onClick={() => setStep('method')} className="text-[#8b92b8] font-700 mb-6">
             Ortga
@@ -184,68 +190,81 @@ const BalancePage: React.FC = () => {
 
   return (
     <div className="page-container" style={{ paddingBottom: 0 }}>
-      <Header balance={balance} />
+      <Header balance={balance} userName={user?.firstName || 'U'} photoUrl={photoUrl} />
       <div className="px-4 py-4 pb-24">
         <button onClick={() => setStep('amount')} className="text-[#8b92b8] font-700 mb-4">
           Ortga
         </button>
 
         <div className="flex flex-col items-center mb-6">
-          <p className="text-[#8b92b8] text-sm font-700 mb-2">To&apos;lov muddati</p>
-          <div className={`text-5xl font-black ${timeLeft < 60 ? 'text-[#f43f5e]' : 'text-[#facc15]'}`}>
+          <p className="text-[#8b92b8] text-sm font-700 mb-2 flex items-center gap-1">
+            <Hourglass size={16} /> To&apos;lov muddati
+          </p>
+          <div className={`text-4xl font-black ${timeLeft < 60 ? 'text-[#f43f5e]' : 'text-[#facc15]'}`}>
             {minutes}:{seconds}
           </div>
         </div>
 
-        <div className="relative w-full aspect-[1.586/1] rounded-[1.5rem] p-6 text-white shadow-2xl mb-6 overflow-hidden bg-gradient-to-br from-[#111827] via-[#1f2937] to-[#111827] border border-white/10 group">
+        <div className="w-[90%] mx-auto relative aspect-[1.586/1] rounded-2xl p-5 text-white shadow-2xl mb-6 overflow-hidden bg-gradient-to-br from-[#111827] via-[#1f2937] to-[#111827] border border-white/10 group">
           {/* Card background glowing effect */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#6366f1]/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#facc15]/10 rounded-full blur-[60px] translate-y-1/3 -translate-x-1/4"></div>
+          <div className="absolute top-0 right-0 w-48 h-48 bg-[#6366f1]/20 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/3"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#facc15]/10 rounded-full blur-[40px] translate-y-1/3 -translate-x-1/4"></div>
 
           {/* Top row: Chip and NFC */}
           <div className="flex justify-between items-start relative z-10">
-            <svg width="45" height="32" viewBox="0 0 45 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="40" height="28" viewBox="0 0 45 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="45" height="32" rx="6" fill="#FACC15" fillOpacity="0.8"/>
               <path d="M0 10H45M0 22H45M14 0V32M31 0V32" stroke="#B45309" strokeOpacity="0.3" strokeWidth="1.5"/>
             </svg>
-            <Wifi className="text-white/80 rotate-90" size={28} />
+            <Wifi className="text-white/80 rotate-90" size={24} />
           </div>
 
           {/* Middle row: Card Number & Copy */}
-          <div className="mt-8 relative z-10">
-            <p className="text-white/60 text-[10px] font-bold uppercase tracking-wider mb-1">Karta raqami</p>
+          <div className="mt-6 relative z-10">
+            <p className="text-white/60 text-[9px] font-bold uppercase tracking-wider mb-1">Karta raqami</p>
             <div className="flex items-center justify-between">
-              <p className="font-mono text-2xl tracking-[0.12em] font-medium drop-shadow-md">{ADMIN_CARD.number}</p>
+              <p className="font-mono text-xl tracking-widest font-medium drop-shadow-md">{ADMIN_CARD.number}</p>
               <button 
                 onClick={copyCard} 
-                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white backdrop-blur-md border border-white/10"
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white backdrop-blur-md border border-white/10"
               >
-                {copied ? <CheckCircle2 size={18} className="text-emerald-400" /> : <Copy size={18} />}
+                {copied ? <CheckCircle2 size={16} className="text-emerald-400" /> : <Copy size={16} />}
               </button>
             </div>
           </div>
 
           {/* Bottom row: Holder & Logo */}
-          <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end z-10">
+          <div className="absolute bottom-5 left-5 right-5 flex justify-between items-end z-10">
             <div>
-              <p className="text-white/60 text-[10px] font-bold uppercase tracking-wider mb-0.5">Egasi</p>
-              <p className="font-bold tracking-wide uppercase">{ADMIN_CARD.holder}</p>
+              <p className="text-white/60 text-[9px] font-bold uppercase tracking-wider mb-0.5">Egasi</p>
+              <p className="text-sm font-bold tracking-wide uppercase">{ADMIN_CARD.holder}</p>
             </div>
             
             {/* Custom generic card logo */}
-            <div className="flex -space-x-3">
-              <div className="w-8 h-8 rounded-full bg-red-500/80 mix-blend-screen"></div>
-              <div className="w-8 h-8 rounded-full bg-yellow-500/80 mix-blend-screen"></div>
+            <div className="flex -space-x-2">
+              <div className="w-6 h-6 rounded-full bg-red-500/80 mix-blend-screen"></div>
+              <div className="w-6 h-6 rounded-full bg-yellow-500/80 mix-blend-screen"></div>
             </div>
           </div>
         </div>
 
-        <div className="card p-4 border border-[#f43f5e]/20 bg-[#f43f5e]/5 mb-4">
-          <p className="text-white/90 text-sm font-600">
-            Aniq{' '}
-            <span className="text-[#facc15] font-black">{Number(amount).toLocaleString()} UZS</span>{' '}
-            o&apos;tkazing, keyin pastdagi tugmani bosing.
+        <div className="card p-3 border border-red-500/30 bg-red-500/10 mb-4 text-center">
+          <p className="text-red-400 text-xs font-bold uppercase tracking-wide">
+            Diqqat! Alif Mobi orqali to'lov taqiqlanadi, qabul qilinmaydi.
           </p>
+        </div>
+
+        <div className="card p-4 border border-white/10 mb-4">
+          <p className="text-white/90 text-sm font-600 mb-3">
+            To'lov qilinganligini tasdiqlovchi chek (skrinshot) ssilkasini kiriting:
+          </p>
+          <input
+            type="url"
+            className="input-field mb-2"
+            placeholder="https://... (Masalan, imgur ssilka)"
+            value={receiptUrl}
+            onChange={(e) => setReceiptUrl(e.target.value)}
+          />
         </div>
 
         {error && <p className="text-[#f43f5e] text-sm text-center mb-3">{error}</p>}

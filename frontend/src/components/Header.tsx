@@ -4,9 +4,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 interface HeaderProps {
   balance?: number;
   userName?: string;
+  photoUrl?: string | null;
 }
 
-const Header: React.FC<HeaderProps> = ({ balance = 0, userName = 'H' }) => {
+const Header: React.FC<HeaderProps> = ({ balance = 0, userName = 'H', photoUrl }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === '/';
@@ -15,12 +16,21 @@ const Header: React.FC<HeaderProps> = ({ balance = 0, userName = 'H' }) => {
     <div className="app-header">
       {/* Avatar */}
       <div className="flex items-center gap-3">
-        <div
-          onClick={() => navigate('/profile')}
-          className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-white font-black text-sm shadow-lg cursor-pointer select-none"
-        >
-          {userName.charAt(0).toUpperCase()}
-        </div>
+        {photoUrl ? (
+          <img 
+            src={photoUrl} 
+            alt="avatar" 
+            className="w-9 h-9 rounded-full object-cover shadow-lg cursor-pointer border border-white/10"
+            onClick={() => navigate('/profile')}
+          />
+        ) : (
+          <div
+            onClick={() => navigate('/profile')}
+            className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-white font-black text-sm shadow-lg cursor-pointer select-none"
+          >
+            {userName.charAt(0).toUpperCase()}
+          </div>
+        )}
 
         {!isHome && (
           <div

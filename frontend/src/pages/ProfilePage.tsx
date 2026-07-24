@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
+import { useAuth } from '../context/AuthContext';
 import api from '../api';
 
 const ProfilePage: React.FC = () => {
+  const { user, photoUrl } = useAuth();
   const [balance, setBalance] = useState(0);
-  const [user, setUser] = useState<{ firstName?: string; username?: string; telegramId?: string; createdAt?: string; } | null>(null);
 
   useEffect(() => {
-    api.get('/users/me')
-      .then(r => {
-        setBalance(r.data?.balance || 0);
-        setUser(r.data);
-      })
-      .catch(() => {});
-  }, []);
+    if (user?.balance) {
+      setBalance(Number(user.balance));
+    }
+  }, [user]);
 
   const displayName = user?.firstName || user?.username || 'Foydalanuvchi';
   const initials = displayName.charAt(0).toUpperCase();
@@ -57,14 +55,22 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="page-container" style={{ paddingBottom: 0 }}>
-      <Header balance={balance} />
+      <Header balance={balance} userName={user?.firstName || 'U'} photoUrl={photoUrl} />
 
       <div className="px-4 py-8 pb-24 flex flex-col items-center">
         {/* Avatar */}
         <div className="relative mb-4">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-white text-3xl font-black shadow-[0_0_30px_rgba(168,85,247,0.4)]">
-            {initials}
-          </div>
+          {photoUrl ? (
+            <img 
+              src={photoUrl} 
+              alt="avatar" 
+              className="w-24 h-24 rounded-full object-cover border-4 border-[#12132b] shadow-[0_0_30px_rgba(168,85,247,0.4)]"
+            />
+          ) : (
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-white text-3xl font-black shadow-[0_0_30px_rgba(168,85,247,0.4)]">
+              {initials}
+            </div>
+          )}
           <div className="absolute bottom-1 right-1 w-5 h-5 bg-[#10b981] border-4 border-[#12132b] rounded-full" />
         </div>
 

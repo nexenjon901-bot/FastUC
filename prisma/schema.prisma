@@ -37,6 +37,7 @@ model Account {
   status           AccountStatus @default(AVAILABLE)
   description      String?      @db.Text
   images           String[]     // S3 urls
+  linkedAccounts   String[]     // e.g. ["Google", "Twitter"]
   createdByAdminId String
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt

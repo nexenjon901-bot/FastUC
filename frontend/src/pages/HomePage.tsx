@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Shield, Key, Mail, Smartphone, Facebook, Twitter } from 'lucide-react';
 import Header from '../components/Header';
 import ImageSlider from '../components/ImageSlider';
+import { useAuth } from '../context/AuthContext';
 import api from '../api';
 
 interface Account {
@@ -15,6 +17,7 @@ interface Account {
   price: string;
   images: string[];
   status: string;
+  linkedAccounts?: string[];
 }
 
 const DEMO_ACCOUNTS: Account[] = [
@@ -28,27 +31,13 @@ const DEMO_ACCOUNTS: Account[] = [
       'https://i.ytimg.com/vi/h2ZlH6YvSBE/maxresdefault.jpg',
     ],
     status: 'AVAILABLE',
-  },
-  {
-    id: '2', sku: 'PG-002',
-    title: 'Ace Dominator — Muzlik M416',
-    rank: 'Ace Dominator', level: 65, skinsCount: 89, ucBalance: 450,
-    price: '1200000',
-    images: ['https://i.ytimg.com/vi/h2ZlH6YvSBE/maxresdefault.jpg'],
-    status: 'AVAILABLE',
-  },
-  {
-    id: '3', sku: 'PG-003',
-    title: 'Crown I — RP100 Akkaunt',
-    rank: 'Crown I', level: 52, skinsCount: 34, ucBalance: 60,
-    price: '250000',
-    images: ['https://i.ytimg.com/vi/Q2bT1kP__k8/maxresdefault.jpg'],
-    status: 'AVAILABLE',
+    linkedAccounts: ['Google', 'Twitter'],
   },
 ];
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const { user, photoUrl } = useAuth();
   const [accounts, setAccounts] = useState<Account[]>(DEMO_ACCOUNTS);
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState(0);
@@ -60,15 +49,26 @@ const HomePage: React.FC = () => {
       .then(res => { if (res.data?.length) setAccounts(res.data); })
       .catch(() => {})
       .finally(() => setLoading(false));
-
-    api.get('/users/me')
-      .then(res => setBalance(res.data?.balance || 0))
-      .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (user?.balance) {
+      setBalance(user.balance);
+    }
+  }, [user]);
+
+  const renderLinkedIcon = (link: string) => {
+    const l = link.toLowerCase();
+    if (l.includes('google') || l.includes('gmail')) return <Mail size={16} className="text-red-400" />;
+    if (l.includes('facebook')) return <Facebook size={16} className="text-blue-500" />;
+    if (l.includes('twitter') || l.includes('x')) return <Twitter size={16} className="text-blue-400" />;
+    if (l.includes('apple')) return <Smartphone size={16} className="text-gray-300" />;
+    return <Key size={16} className="text-gray-400" />;
+  };
 
   return (
     <div className="page-container" style={{ paddingBottom: 0 }}>
-      <Header balance={balance} />
+      <Header balance={balance} userName={user?.firstName || 'U'} photoUrl={photoUrl} />
 
       <div className="px-4 py-4 pb-24">
         {/* Balance card on home */}
@@ -123,22 +123,27 @@ const HomePage: React.FC = () => {
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <h3 className="text-white font-black text-base leading-snug flex-1">{acc.title}</h3>
-                    <span className="rank-badge whitespace-nowrap">{acc.rank}</span>
                   </div>
 
-                  {/* Stats row */}
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="bg-[#12132b] rounded-xl p-2.5 text-center">
+                  {/* Stats row - Level & Privacy only */}
+                  <div className="flex gap-2 mb-4">
+                    <div className="bg-[#12132b] rounded-xl p-2.5 flex-1 flex flex-col items-center justify-center">
                       <p className="text-[#8b92b8] text-[10px] font-700 uppercase mb-0.5">Level</p>
                       <p className="text-white font-black text-base">{acc.level}</p>
                     </div>
-                    <div className="bg-[#12132b] rounded-xl p-2.5 text-center">
-                      <p className="text-[#8b92b8] text-[10px] font-700 uppercase mb-0.5">Skinlar</p>
-                      <p className="text-white font-black text-base">{acc.skinsCount}</p>
-                    </div>
-                    <div className="bg-[#12132b] rounded-xl p-2.5 text-center">
-                      <p className="text-[#8b92b8] text-[10px] font-700 uppercase mb-0.5">UC</p>
-                      <p className="text-white font-black text-base">{acc.ucBalance}</p>
+                    <div className="bg-[#12132b] rounded-xl p-2.5 flex-1 flex flex-col items-center justify-center">
+                      <p className="text-[#8b92b8] text-[10px] font-700 uppercase mb-0.5 flex items-center gap-1">
+                        <Shield size={10} /> Privacy
+                      </p>
+                      <div className="flex gap-1.5 mt-1">
+                        {acc.linkedAccounts?.length ? (
+                          acc.linkedAccounts.map((link, i) => (
+                            <span key={i} title={link}>{renderLinkedIcon(link)}</span>
+                          ))
+                        ) : (
+                          <span className="text-gray-500 text-xs">-</span>
+                        )}
+                      </div>
                     </div>
                   </div>
 

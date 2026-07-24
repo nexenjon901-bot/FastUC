@@ -5,6 +5,7 @@ import api from '../api';
 interface AuthContextType {
   user: any | null;
   token: string | null;
+  photoUrl: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   refreshUser: () => Promise<void>;
@@ -14,6 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   token: null,
+  photoUrl: null,
   isLoading: true,
   isAuthenticated: false,
   refreshUser: async () => {},
@@ -24,6 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<any | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   const refreshUser = useCallback(async () => {
     try {
@@ -38,6 +41,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('access_token', access_token);
     setToken(access_token);
     if (userData) setUser(userData);
+    
+    if (WebApp.initDataUnsafe?.user?.photo_url) {
+      setPhotoUrl(WebApp.initDataUnsafe.user.photo_url);
+    }
   };
 
   const devLogin = useCallback(async () => {
@@ -95,6 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         token,
+        photoUrl,
         isLoading,
         isAuthenticated: !!token,
         refreshUser,
