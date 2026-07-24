@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { ConfigService } from '@nestjs/config';
@@ -12,9 +12,16 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async validateTelegramData(initData: string): Promise<any> {
-    const botToken = this.configService.get<string>('TELEGRAM_BOT_TOKEN');
-    if (!botToken) throw new Error('TELEGRAM_BOT_TOKEN is not configured');
+  private getBotToken(): string {
+    const token =
+      this.configService.get<string>('TELEGRAM_BOT_TOKEN') ||
+      this.configService.get<string>('BOT_TOKEN');
+    if (!token) throw new UnauthorizedException('TELEGRAM_BOT_TOKEN is not configured');
+    return token;
+  }
+
+  async validateTelegramData(initData: string) {
+    const botToken = this.getBotToken();
 
     const urlParams = new URLSearchParams(initData);
     const hash = urlParams.get('hash');
@@ -26,7 +33,10 @@ export class AuthService {
       .join('\n');
 
     const secretKey = crypto.createHmac('sha256', 'WebAppData').update(botToken).digest();
-    const calculatedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+    const calculatedHash = crypto
+      .createHmac('sha256', secretKey)
+      .update(dataCheckString)
+      .digest('hex');
 
     if (calculatedHash !== hash) {
       throw new UnauthorizedException('Invalid Telegram initData');
@@ -34,7 +44,6 @@ export class AuthService {
 
     const authDate = parseInt(urlParams.get('auth_date') || '0', 10);
     const now = Math.floor(Date.now() / 1000);
-    // 24 hours = 86400 seconds
     if (now - authDate > 86400) {
       throw new UnauthorizedException('Telegram auth_date is too old');
     }
@@ -45,15 +54,34 @@ export class AuthService {
     }
 
     const telegramUser = JSON.parse(userStr);
-    
-    // Find or create user
     const user = await this.usersService.upsertTelegramUser(telegramUser);
 
     if (user.isBlocked) {
       throw new UnauthorizedException('User is blocked');
     }
 
-    const payload = { sub: user.id, telegramId: user.telegramId, role: 'USER' };
+    const payload = { sub: user.id, telegramId: user.telegramId, role: 'USER', typ: 'user' };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user,
+    };
+  }
+
+  /** Local / browser testing without Telegram WebApp */
+  async devLogin(telegramId = 'dev-user-1', firstName = 'Dev User') {
+    const nodeEnv = this.configService.get<string>('NODE_ENV') || process.env.NODE_ENV;
+    if (nodeEnv === 'production') {
+      throw new ForbiddenException('Dev login disabled in production');
+    }
+
+    const user = await this.usersService.upsertTelegramUser({
+      id: telegramId,
+      username: 'devuser',
+      first_name: firstName,
+      language_code: 'uz',
+    });
+
+    const payload = { sub: user.id, telegramId: user.telegramId, role: 'USER', typ: 'user' };
     return {
       access_token: this.jwtService.sign(payload),
       user,

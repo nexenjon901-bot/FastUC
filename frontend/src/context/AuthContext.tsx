@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import WebApp from '@twa-dev/sdk';
 import api from '../api';
 
@@ -7,6 +7,8 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  refreshUser: () => Promise<void>;
+  devLogin: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -14,6 +16,8 @@ const AuthContext = createContext<AuthContextType>({
   token: null,
   isLoading: true,
   isAuthenticated: false,
+  refreshUser: async () => {},
+  devLogin: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -21,31 +25,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const refreshUser = useCallback(async () => {
+    try {
+      const res = await api.get('/users/me');
+      setUser(res.data);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const applyAuth = (access_token: string, userData?: any) => {
+    localStorage.setItem('access_token', access_token);
+    setToken(access_token);
+    if (userData) setUser(userData);
+  };
+
+  const devLogin = useCallback(async () => {
+    const res = await api.post('/auth/dev-login', {
+      telegramId: 'dev-user-1',
+      firstName: 'Dev User',
+    });
+    applyAuth(res.data.access_token, res.data.user);
+  }, []);
+
   useEffect(() => {
     const authenticate = async () => {
       try {
         if (WebApp.ready) WebApp.ready();
         const initData = WebApp.initData;
 
-        // For development: if no initData, use stored token
+        if (initData) {
+          const res = await api.post('/auth/telegram', { initData });
+          applyAuth(res.data.access_token, res.data.user);
+          return;
+        }
+
         const storedToken = localStorage.getItem('access_token');
-        if (!initData && storedToken) {
+        if (storedToken) {
           setToken(storedToken);
-          setIsLoading(false);
+          try {
+            const res = await api.get('/users/me');
+            setUser(res.data);
+          } catch {
+            // token invalid — try dev login in browser
+            if (import.meta.env.DEV) {
+              await devLogin();
+            }
+          }
           return;
         }
 
-        if (!initData) {
-          console.warn('No Telegram initData available (not in Telegram)');
-          setIsLoading(false);
-          return;
+        // Browser without Telegram: auto dev-login in development
+        if (import.meta.env.DEV) {
+          console.warn('No Telegram initData — using dev-login');
+          await devLogin();
         }
-
-        const res = await api.post('/auth/telegram', { initData });
-        const { access_token, user: userData } = res.data;
-        localStorage.setItem('access_token', access_token);
-        setToken(access_token);
-        setUser(userData);
       } catch (err) {
         console.error('Auth failed:', err);
       } finally {
@@ -54,10 +88,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     authenticate();
-  }, []);
+  }, [devLogin]);
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, isAuthenticated: !!token }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isLoading,
+        isAuthenticated: !!token,
+        refreshUser,
+        devLogin,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,19 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { UsersModule } from '../users/users.module';
-import { BullModule } from '@nestjs/bullmq';
+import { BotModule } from '../bot/bot.module';
 
 @Module({
-  imports: [
-    UsersModule,
-    // Optional: Add BullModule for delayed jobs (e.g., auto-confirm in 48 hours)
-    /*
-    BullModule.registerQueue({
-      name: 'orders',
-    }),
-    */
-  ],
+  imports: [UsersModule, forwardRef(() => BotModule)],
   controllers: [OrdersController],
   providers: [OrdersService],
   exports: [OrdersService],

@@ -3,69 +3,130 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import api from '../api';
 
+const tabs = [
+  { key: 'Hammasi', statuses: null as string[] | null },
+  {
+    key: 'Kutilmoqda',
+    statuses: ['ESCROW_HELD', 'ADMIN_REVIEW', 'CREDENTIALS_SENT', 'DISPUTED', 'PENDING_PAYMENT'],
+  },
+  { key: 'Muvaffaqiyatli', statuses: ['COMPLETED', 'BUYER_CONFIRMED'] },
+  { key: 'Bekor', statuses: ['CANCELLED', 'REFUNDED'] },
+];
+
+const statusLabel: Record<string, string> = {
+  ESCROW_HELD: 'Escrow',
+  ADMIN_REVIEW: 'Admin tekshiruv',
+  CREDENTIALS_SENT: 'Login yuborildi',
+  COMPLETED: 'Yakunlangan',
+  DISPUTED: 'Nizo',
+  CANCELLED: 'Bekor',
+  REFUNDED: 'Qaytarilgan',
+  PENDING_PAYMENT: 'To‘lov kutilmoqda',
+  BUYER_CONFIRMED: 'Tasdiqlangan',
+};
+
 const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
-  const [balance, setBalance] = useState<number>(0);
+  const [balance, setBalance] = useState(0);
   const [activeTab, setActiveTab] = useState('Hammasi');
-
-  const tabs = ['Hammasi', 'Kutilmoqda', 'Muvaffaqiyatli', 'Bekor qilingan'];
+  const [query, setQuery] = useState('');
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/users/me')
-      .then(res => setBalance(res.data.balance || 0))
-      .catch(() => {});
+    api.get('/users/me').then((r) => setBalance(Number(r.data?.balance) || 0)).catch(() => {});
+    api
+      .get('/orders')
+      .then((r) => setOrders(r.data || []))
+      .catch(() => setOrders([]))
+      .finally(() => setLoading(false));
   }, []);
 
+  const tab = tabs.find((t) => t.key === activeTab)!;
+  const filtered = orders.filter((o) => {
+    if (tab.statuses && !tab.statuses.includes(o.status)) return false;
+    if (!query.trim()) return true;
+    const q = query.toLowerCase();
+    return (
+      o.orderNumber?.toLowerCase().includes(q) ||
+      o.account?.title?.toLowerCase().includes(q) ||
+      o.account?.sku?.toLowerCase().includes(q)
+    );
+  });
+
   return (
-    <div className="page-container flex flex-col" style={{ padding: 0 }}>
+    <div className="page-container" style={{ paddingBottom: 0 }}>
       <Header balance={balance} />
 
-      <div className="px-4 py-6 flex-1 flex flex-col">
-        <h1 className="text-xl font-black text-white text-center mb-6">Buyurtmalar tarixi</h1>
-        
-        {/* Search */}
+      <div className="px-4 py-4 pb-24">
+        <h1 className="text-xl font-black text-white text-center mb-5">Buyurtmalar tarixi</h1>
+
         <div className="relative mb-4">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" className="text-white/40">
-              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <input 
-            type="text" 
-            placeholder="Buyurtma ID yoki o'yin bo'yicha qidirish..."
-            className="w-full bg-[#1c1d33] border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:border-[#6366f1] transition-colors placeholder:text-white/30"
+          <input
+            type="text"
+            placeholder="Buyurtma ID yoki akkaunt..."
+            className="input-field pl-4"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
           />
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 mb-10">
-          {tabs.map(tab => (
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4 mb-6">
+          {tabs.map((t) => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-colors border ${
-                activeTab === tab 
-                  ? 'bg-gradient-to-r from-indigo-500 to-indigo-400 text-white border-transparent shadow-[0_0_15px_rgba(99,102,241,0.5)]' 
-                  : 'bg-[#242746] text-white/50 border-white/5 hover:bg-[#2c3053]'
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-800 border transition-all ${
+                activeTab === t.key
+                  ? 'bg-[#6366f1] text-white border-[#6366f1]'
+                  : 'bg-[#1e2040] text-[#8b92b8] border-white/8'
               }`}
             >
-              {tab}
+              {t.key}
             </button>
           ))}
         </div>
 
-        {/* Empty State */}
-        <div className="flex-1 flex flex-col items-center justify-center mt-10">
-          <div className="w-20 h-20 bg-[#242746] rounded-3xl flex items-center justify-center mb-6 shadow-lg border border-white/5">
-            <svg width="40" height="40" fill="none" viewBox="0 0 24 24" className="text-white/80">
-              <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+        {loading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="shimmer h-20 rounded-2xl" />
+            ))}
           </div>
-          <h2 className="text-2xl font-black text-white mb-3">Buyurtmalar hali yo'q</h2>
-          <p className="text-indigo-300/80 text-center text-sm leading-relaxed max-w-[280px]">
-            Buyurtmalar tarixingiz birinchi xaridingizdan keyin shu yerda ko'rinadi.
-          </p>
-        </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center mt-16">
+            <h2 className="text-2xl font-black text-white mb-3">Buyurtmalar hali yo&apos;q</h2>
+            <p className="text-[#8b92b8] text-center text-sm max-w-[260px] mb-6">
+              Birinchi xaridingizdan keyin shu yerda ko&apos;rinadi.
+            </p>
+            <button onClick={() => navigate('/')} className="btn-primary">
+              Akkauntlar
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((order) => (
+              <button
+                key={order.id}
+                onClick={() => navigate(`/orders/${order.id}`)}
+                className="card-inner p-4 w-full text-left active:scale-[0.98] transition-transform"
+              >
+                <div className="flex justify-between items-start gap-3 mb-2">
+                  <div>
+                    <p className="text-white font-bold text-sm">{order.account?.title || 'Akkaunt'}</p>
+                    <code className="text-[#8b92b8] text-xs">{order.orderNumber}</code>
+                  </div>
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-[#6366f1]/20 text-[#a5b4fc] font-bold">
+                    {statusLabel[order.status] || order.status}
+                  </span>
+                </div>
+                <p className="text-[#facc15] font-black text-sm">
+                  {Number(order.amount).toLocaleString()} UZS
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

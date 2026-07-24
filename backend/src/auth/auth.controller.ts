@@ -9,4 +9,12 @@ export class AuthController {
   async telegramAuth(@Body('initData') initData: string) {
     return this.authService.validateTelegramData(initData);
   }
+
+  @Post('dev-login')
+  async devLogin(
+    @Body('telegramId') telegramId?: string,
+    @Body('firstName') firstName?: string,
+  ) {
+    return this.authService.devLogin(telegramId, firstName);
+  }
 }

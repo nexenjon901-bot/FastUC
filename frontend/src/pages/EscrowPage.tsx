@@ -13,9 +13,11 @@ const STEPS = [
 const STATUS_TO_STEP: Record<string, number> = {
   ESCROW_HELD: 0,
   ADMIN_REVIEW: 1,
+  DISPUTED: 1,
   CREDENTIALS_SENT: 2,
   BUYER_CONFIRMED: 3,
   COMPLETED: 3,
+  REFUNDED: 3,
 };
 
 const EscrowPage: React.FC = () => {
@@ -68,7 +70,15 @@ const EscrowPage: React.FC = () => {
     </div>
   );
 
-  if (!order) return null;
+  if (!order) {
+    return (
+      <div className="page-container flex flex-col items-center justify-center h-screen">
+        <h2 className="text-danger font-bold text-xl mb-2">Xatolik</h2>
+        <p className="text-secondary text-sm mb-4">Buyurtma topilmadi yoki tarmoq xatosi.</p>
+        <button onClick={() => navigate('/orders')} className="btn-secondary">Buyurtmalarga qaytish</button>
+      </div>
+    );
+  }
 
   const step = STATUS_TO_STEP[order.status] ?? 0;
 
@@ -168,6 +178,12 @@ const EscrowPage: React.FC = () => {
           >
             {t('orders.dispute')}
           </button>
+        </div>
+      )}
+
+      {order.status === 'DISPUTED' && (
+        <div className="card border border-warning/30 text-center py-6 mb-4">
+          <p className="text-warning font-bold">Nizo ochilgan — admin ko&apos;rib chiqmoqda</p>
         </div>
       )}
 

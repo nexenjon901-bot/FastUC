@@ -14,6 +14,7 @@ import BalancePage from './pages/BalancePage';
 import OrdersPage from './pages/OrdersPage';
 import EscrowPage from './pages/EscrowPage';
 import ProfilePage from './pages/ProfilePage';
+import AdminPage from './pages/AdminPage';
 
 const queryClient = new QueryClient();
 
@@ -46,10 +47,14 @@ const App: React.FC = () => {
                 <Route path="/orders" element={<OrdersPage />} />
                 <Route path="/orders/:id" element={<EscrowPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/admin" element={<AdminPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>
-            <BottomNav />
+            <Routes>
+              <Route path="/admin" element={null} />
+              <Route path="*" element={<BottomNav />} />
+            </Routes>
           </div>
         </BrowserRouter>
       </AuthProvider>

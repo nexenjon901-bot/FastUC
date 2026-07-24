@@ -6,6 +6,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -132,7 +133,7 @@ model AdminUser {
   id                  String     @id @default(uuid())
   email               String     @unique
   passwordHash        String
-  totpSecret          String
+  totpSecret          String?
   role                AdminRole  @default(MODERATOR)
   isActive            Boolean    @default(true)
   lastLoginAt         DateTime?
@@ -183,7 +184,7 @@ model TopUpRequest {
   user             User            @relation(fields: [userId], references: [id])
   amount           Decimal         @db.Decimal(10, 2)
   method           PaymentProvider
-  proofImageUrl    String
+  proofImageUrl    String?
   userComment      String?
   status           TopUpStatus     @default(PENDING)
   reviewedByAdminId String?

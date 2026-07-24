@@ -58,7 +58,15 @@ const AccountDetailPage: React.FC = () => {
     );
   }
 
-  if (!account) return null;
+  if (!account) {
+    return (
+      <div className="page-container flex flex-col items-center justify-center h-screen">
+        <h2 className="text-danger font-bold text-xl mb-2">Xatolik</h2>
+        <p className="text-secondary text-sm mb-4">Akkaunt topilmadi yoki tarmoq xatosi.</p>
+        <button onClick={() => navigate(-1)} className="btn-secondary">Orqaga qaytish</button>
+      </div>
+    );
+  }
 
   const formatPrice = (p: string) => Number(p).toLocaleString('uz-UZ') + ' UZS';
 

@@ -1,30 +1,48 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Optional, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentProvider } from '@prisma/client';
+import { BotService } from '../bot/bot.service';
 
 @Injectable()
 export class TopupService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Optional() @Inject(forwardRef(() => BotService)) private bot?: BotService,
+  ) {}
 
-  async requestTopup(userId: string, amount: number, method: string, proofImageUrl: string, userComment?: string) {
-    if (amount <= 0) {
+  async requestTopup(
+    userId: string,
+    amount: number,
+    method: string,
+    proofImageUrl?: string,
+    userComment?: string,
+  ) {
+    if (!amount || amount <= 0) {
       throw new BadRequestException('Amount must be positive');
     }
-    
-    // Check if the provider is valid
+
     if (!Object.values(PaymentProvider).includes(method as any)) {
       throw new BadRequestException('Invalid payment method');
     }
 
-    return this.prisma.topUpRequest.create({
+    const request = await this.prisma.topUpRequest.create({
       data: {
         userId,
         amount,
         method: method as PaymentProvider,
-        proofImageUrl,
+        proofImageUrl: proofImageUrl || null,
         userComment,
       },
+      include: { user: true },
     });
+
+    void this.bot?.notifyUser(
+      request.user.telegramId,
+      `⏳ To'lov so'rovi qabul qilindi: ${Number(amount).toLocaleString()} UZS\nAdmin tasdiqlashini kuting.`,
+    );
+
+    const { user: _u, ...safe } = request as any;
+    return safe;
   }
 
   async getMyRequests(userId: string) {
