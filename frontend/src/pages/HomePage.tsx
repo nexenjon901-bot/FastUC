@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Key, Mail, Smartphone, Twitter, Globe } from 'lucide-react';
+import { Shield, Key, Mail, Smartphone, AtSign, Globe } from 'lucide-react';
 import Header from '../components/Header';
 import ImageSlider from '../components/ImageSlider';
 import { useAuth } from '../context/AuthContext';
@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
     const l = link.toLowerCase();
     if (l.includes('google') || l.includes('gmail')) return <Mail size={16} className="text-red-400" />;
     if (l.includes('facebook')) return <Globe size={16} className="text-blue-500" />;
-    if (l.includes('twitter') || l.includes('x')) return <Twitter size={16} className="text-blue-400" />;
+    if (l.includes('twitter') || l.includes('x')) return <AtSign size={16} className="text-blue-400" />;
     if (l.includes('apple')) return <Smartphone size={16} className="text-gray-300" />;
     return <Key size={16} className="text-gray-400" />;
   };
