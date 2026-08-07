@@ -104,7 +104,7 @@ const HomePage: React.FC = () => {
         {loading ? (
           <div className="flex flex-col gap-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="card h-64 animate-pulse bg-[#1e2040]" />
+              <div key={i} className="rounded-[24px] aspect-[16/10] animate-pulse bg-[#1e2040]" />
             ))}
           </div>
         ) : (
@@ -113,52 +113,47 @@ const HomePage: React.FC = () => {
               <div
                 key={acc.id}
                 onClick={() => navigate(`/accounts/${acc.id}`)}
-                className="card cursor-pointer active:scale-[0.98] transition-transform animate-fade-in-up"
+                className="relative rounded-[24px] overflow-hidden cursor-pointer active:scale-[0.98] transition-transform aspect-[16/10] shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-white/5 group"
                 style={{ animationDelay: `${idx * 0.07}s` }}
               >
-                {/* Image slider */}
-                <ImageSlider images={acc.images} title={acc.title} />
+                {/* Background Image */}
+                {acc.images?.[0] ? (
+                  <img src={acc.images[0]} alt={acc.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                ) : (
+                  <div className="absolute inset-0 w-full h-full bg-[#1e2040]" />
+                )}
 
-                {/* Info */}
-                <div className="p-4">
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <h3 className="text-white font-black text-base leading-snug flex-1">{acc.title}</h3>
-                  </div>
+                {/* Dark Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/40 to-transparent opacity-95" />
 
-                  {/* Stats row - Level & Privacy only */}
-                  <div className="flex gap-2 mb-4">
-                    <div className="bg-[#12132b] rounded-xl p-2.5 flex-1 flex flex-col items-center justify-center">
-                      <p className="text-[#8b92b8] text-[10px] font-700 uppercase mb-0.5">Level</p>
-                      <p className="text-white font-black text-base">{acc.level}</p>
-                    </div>
-                    <div className="bg-[#12132b] rounded-xl p-2.5 flex-1 flex flex-col items-center justify-center">
-                      <p className="text-[#8b92b8] text-[10px] font-700 uppercase mb-0.5 flex items-center gap-1">
-                        <Shield size={10} /> Privacy
-                      </p>
-                      <div className="flex gap-1.5 mt-1">
-                        {acc.linkedAccounts?.length ? (
-                          acc.linkedAccounts.map((link, i) => (
-                            <span key={i} title={link}>{renderLinkedIcon(link)}</span>
-                          ))
-                        ) : (
-                          <span className="text-gray-500 text-xs">-</span>
-                        )}
-                      </div>
-                    </div>
+                {/* Top Badges */}
+                <div className="absolute top-4 left-4 flex gap-2">
+                  <div className="bg-[#12132b]/80 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase border border-white/10">
+                    Level {acc.level}
                   </div>
+                  {acc.linkedAccounts?.length && (
+                    <div className="bg-[#12132b]/80 backdrop-blur-md flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10">
+                      {acc.linkedAccounts.map((link, i) => (
+                        <span key={i} title={link}>{renderLinkedIcon(link)}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-                  {/* Price + Buy */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[#8b92b8] text-xs">Narxi</p>
-                      <p className="text-[#facc15] font-black text-xl">
-                        {Number(acc.price).toLocaleString()} UZS
-                      </p>
-                    </div>
-                    <button className="btn-yellow px-5 py-2.5 rounded-xl text-sm">
-                      Sotib olish
-                    </button>
+                {/* Bottom Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 pb-5 flex items-end justify-between">
+                  <div className="flex-1 pr-4">
+                    <h3 className="text-white font-black text-xl leading-tight drop-shadow-lg mb-1 line-clamp-2 uppercase tracking-wide">
+                      {acc.title}
+                    </h3>
+                    <p className="text-white/80 font-bold text-sm drop-shadow-md">
+                      {Number(acc.price).toLocaleString()} UZS
+                    </p>
                   </div>
+                  
+                  <button className="bg-[#facc15] hover:bg-[#eab308] text-black font-black text-sm px-6 py-3 rounded-full transition-colors whitespace-nowrap shadow-[0_4px_14px_rgba(250,204,21,0.4)]">
+                    Sotib olish
+                  </button>
                 </div>
               </div>
             ))}
@@ -167,24 +162,34 @@ const HomePage: React.FC = () => {
 
         {/* PUBG UC Section */}
         <div className="mt-8 mb-4">
-          <h2 className="section-title">PUBG UC Xarid qilish</h2>
+          <h2 className="text-white font-black text-lg text-center uppercase tracking-wide mb-5 drop-shadow-md">PUBG UC</h2>
           {ucProducts.length === 0 ? (
             <p className="text-[#8b92b8] text-sm text-center mt-4">Mahsulotlar yuklanmoqda...</p>
           ) : (
-            <div className="grid grid-cols-3 gap-3 mt-4">
+            <div className="grid grid-cols-3 gap-3">
               {ucProducts.map((product) => (
                 <div
                   key={product.id}
                   onClick={() => navigate(`/products/${product.id}`)}
-                  className="card p-3 cursor-pointer active:scale-95 transition-transform text-center flex flex-col items-center justify-center bg-[#1e2040]"
+                  className="relative rounded-[16px] overflow-hidden cursor-pointer active:scale-95 transition-transform aspect-[3/4] border border-white/5 group shadow-lg"
                 >
+                  {/* Background Image */}
                   {product.imageUrl ? (
-                    <img src={product.imageUrl} alt={product.name} className="w-14 h-14 object-cover rounded-xl mb-2" />
+                    <img src={product.imageUrl} alt={product.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   ) : (
-                    <div className="w-14 h-14 bg-[#12132b] rounded-xl mb-2 flex items-center justify-center text-[#facc15] text-2xl">💎</div>
+                    <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-[#1e2040] to-[#0a0a0f] flex items-center justify-center text-4xl opacity-80">
+                      💎
+                    </div>
                   )}
-                  <p className="text-white font-bold text-xs leading-tight">{product.name}</p>
-                  <p className="text-[#facc15] text-xs font-black mt-0.5">{Number(product.price).toLocaleString()} UZS</p>
+                  
+                  {/* Gradient Overlay for Text */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/50 to-transparent opacity-90" />
+                  
+                  {/* Text Content */}
+                  <div className="absolute inset-0 p-2.5 flex flex-col justify-end text-center pb-3">
+                    <h3 className="text-white font-black text-[13px] leading-tight drop-shadow-md">{product.name}</h3>
+                    <p className="text-[#facc15] text-[11px] font-bold drop-shadow-md mt-0.5">{Number(product.price).toLocaleString()} UZS</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -193,24 +198,31 @@ const HomePage: React.FC = () => {
 
         {/* Telegram Stars Section */}
         <div className="mt-8 mb-4">
-          <h2 className="section-title" style={{ color: '#a78bfa' }}>⭐ Telegram Stars</h2>
+          <h2 className="text-white font-black text-lg text-center uppercase tracking-wide mb-5 drop-shadow-md">Telegram Stars</h2>
           {starsProducts.length === 0 ? (
             <p className="text-[#8b92b8] text-sm text-center mt-4">Mahsulotlar yuklanmoqda...</p>
           ) : (
-            <div className="grid grid-cols-3 gap-3 mt-4">
+            <div className="grid grid-cols-3 gap-3">
               {starsProducts.map((product) => (
                 <div
                   key={product.id}
                   onClick={() => navigate(`/products/${product.id}`)}
-                  className="card p-3 cursor-pointer active:scale-95 transition-transform text-center flex flex-col items-center justify-center bg-purple-500/10 border border-purple-500/20"
+                  className="relative rounded-[16px] overflow-hidden cursor-pointer active:scale-95 transition-transform aspect-[3/4] border border-white/5 group shadow-lg"
                 >
                   {product.imageUrl ? (
-                    <img src={product.imageUrl} alt={product.name} className="w-14 h-14 object-cover rounded-xl mb-2" />
+                    <img src={product.imageUrl} alt={product.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   ) : (
-                    <div className="w-14 h-14 bg-[#12132b] rounded-xl mb-2 flex items-center justify-center text-purple-400 text-2xl">⭐</div>
+                    <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-blue-900/40 to-[#0a0a0f] flex items-center justify-center text-4xl opacity-80">
+                      ⭐
+                    </div>
                   )}
-                  <p className="text-white font-bold text-xs leading-tight">{product.name}</p>
-                  <p className="text-purple-400 text-xs font-black mt-0.5">{Number(product.price).toLocaleString()} UZS</p>
+                  
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/50 to-transparent opacity-90" />
+                  
+                  <div className="absolute inset-0 p-2.5 flex flex-col justify-end text-center pb-3">
+                    <h3 className="text-white font-black text-[13px] leading-tight drop-shadow-md">{product.name}</h3>
+                    <p className="text-[#60a5fa] text-[11px] font-bold drop-shadow-md mt-0.5">{Number(product.price).toLocaleString()} UZS</p>
+                  </div>
                 </div>
               ))}
             </div>
