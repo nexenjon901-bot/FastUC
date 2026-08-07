@@ -1,18 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 const ProfilePage: React.FC = () => {
   const { user, photoUrl } = useAuth();
   const [balance, setBalance] = useState(0);
+  const [completedOrders, setCompletedOrders] = useState(0);
 
   useEffect(() => {
     if (user?.balance) {
       setBalance(Number(user.balance));
     }
+    
+    // Fetch orders to get completed count
+    api.get('/orders').then(res => {
+      const orders = res.data || [];
+      const completed = orders.filter((o: any) => o.status === 'COMPLETED' || o.status === 'DELIVERED').length;
+      setCompletedOrders(completed);
+    }).catch(() => {
+      // Ignore if fails
+    });
   }, [user]);
 
   const displayName = user?.firstName || user?.username || 'Foydalanuvchi';
+  const tgId = user?.telegramId || user?.id || '—';
+  const usernameText = user?.username ? `@${user.username}` : 'Mavjud emas';
+  
   const initials = displayName.charAt(0).toUpperCase();
   const joinDate = user?.createdAt
     ? new Date(user.createdAt).toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.')
@@ -74,7 +88,8 @@ const ProfilePage: React.FC = () => {
         </div>
 
         {/* Name */}
-        <h1 className="text-2xl font-black text-white mb-2">{displayName}</h1>
+        <h1 className="text-2xl font-black text-white mb-1">{displayName}</h1>
+        <p className="text-[#8b92b8] text-sm mb-4 font-medium">{usernameText}</p>
 
         {/* ID badge */}
         <div className="flex items-center gap-2 px-4 py-1.5 bg-[#1e2040] rounded-full border border-[#6366f1]/20 mb-8">
@@ -82,7 +97,7 @@ const ProfilePage: React.FC = () => {
             <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
             <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
           </svg>
-          <span className="text-[#8b92b8] font-800 text-sm">ID: {user?.telegramId || '—'}</span>
+          <span className="text-[#8b92b8] font-800 text-sm">ID: {tgId}</span>
         </div>
 
         {/* Stats */}
@@ -97,7 +112,7 @@ const ProfilePage: React.FC = () => {
             <p className="text-[#8b92b8] text-[10px] font-800 uppercase tracking-wider leading-tight mb-2">
               Bajarilgan<br/>Buyurtmalar
             </p>
-            <p className="text-white font-black text-2xl">0</p>
+            <p className="text-white font-black text-2xl">{completedOrders}</p>
           </div>
 
           <div className="card-inner p-5 flex flex-col items-center text-center">

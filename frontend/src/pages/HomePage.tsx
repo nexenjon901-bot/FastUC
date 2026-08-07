@@ -71,31 +71,8 @@ const HomePage: React.FC = () => {
       <Header balance={balance} userName={user?.firstName || 'U'} photoUrl={photoUrl} />
 
       <div className="px-4 py-4 pb-24">
-        {/* Balance card on home */}
-        <div
-          onClick={() => navigate('/balance')}
-          className="card-inner p-4 flex items-center justify-between mb-6 cursor-pointer active:scale-[0.98] transition-transform"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#12132b] flex items-center justify-center">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className="text-[#facc15]">
-                <rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
-                <path d="M16 3H8L2 7h20l-6-4z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                <circle cx="17" cy="15" r="1.5" fill="currentColor"/>
-              </svg>
-            </div>
-            <div>
-              <p className="text-[#8b92b8] text-xs font-700">Hisobingiz</p>
-              <p className="text-white font-black text-lg leading-tight">{Number(balance).toLocaleString()} UZS</p>
-            </div>
-          </div>
-          <button className="btn-yellow text-sm px-4 py-2 rounded-xl">
-            + To'ldirish
-          </button>
-        </div>
-
         {/* Section title */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 mt-2">
           <h2 className="section-title">PUBG Akkauntlar</h2>
           <span className="badge badge-info">{accounts.length} ta</span>
         </div>
@@ -164,6 +141,41 @@ const HomePage: React.FC = () => {
             ))}
           </div>
         )}
+
+        {/* PUBG UC Section */}
+        <div className="mt-8 mb-4">
+          <h2 className="section-title">PUBG UC Xarid qilish</h2>
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="card p-3 cursor-pointer active:scale-95 transition-transform text-center flex flex-col items-center justify-center bg-[#1e2040]">
+                {/* Placeholder for UC image */}
+                <div className="w-16 h-16 bg-[#12132b] rounded-full mb-2 flex items-center justify-center text-[#facc15] font-black text-xs border border-[#facc15]/20">
+                  UC Logo
+                </div>
+                <p className="text-white font-bold text-sm">60 UC</p>
+                <p className="text-[#facc15] text-xs font-black">15,000 UZS</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Telegram Stars Section */}
+        <div className="mt-8 mb-4">
+          <h2 className="section-title text-blue-400">Telegram Stars</h2>
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            {[1, 2].map((i) => (
+              <div key={i} className="card p-3 cursor-pointer active:scale-95 transition-transform text-center flex flex-col items-center justify-center bg-blue-500/10 border border-blue-500/20">
+                {/* Placeholder for Stars image */}
+                <div className="w-16 h-16 bg-[#12132b] rounded-full mb-2 flex items-center justify-center text-blue-400 font-black text-xs border border-blue-400/20">
+                  ⭐️ Star
+                </div>
+                <p className="text-white font-bold text-sm">50 Stars</p>
+                <p className="text-blue-400 text-xs font-black">12,000 UZS</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );
