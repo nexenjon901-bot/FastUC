@@ -4,7 +4,7 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { AdminJwtGuard } from '../admin/admin-jwt.guard';
+import { AdminAuthGuard } from '../admin/admin-auth.guard';
 import { ProductCategory } from '@prisma/client';
 
 // ── Public + User routes ──────────────────────────────────
@@ -46,7 +46,7 @@ export class ProductOrdersController {
 }
 
 // ── Admin routes ──────────────────────────────────────────
-@UseGuards(AdminJwtGuard)
+@UseGuards(AdminAuthGuard)
 @Controller('admin/products')
 export class AdminProductsController {
   constructor(private readonly productsService: ProductsService) {}
