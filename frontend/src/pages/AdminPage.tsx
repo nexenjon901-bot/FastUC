@@ -706,7 +706,6 @@ const AdminPage: React.FC = () => {
             </div>
           </div>
         )}
-        )}
 
         {/* ─── PRODUCTS TAB ─────────────────────────────────────────── */}
         {tab === 'products' && (
