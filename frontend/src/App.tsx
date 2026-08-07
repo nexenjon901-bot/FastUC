@@ -15,6 +15,7 @@ import OrdersPage from './pages/OrdersPage';
 import EscrowPage from './pages/EscrowPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
+import ProductPurchasePage from './pages/ProductPurchasePage';
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App: React.FC = () => {
                 <Route path="/orders/:id" element={<EscrowPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/products/:id" element={<ProductPurchasePage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>

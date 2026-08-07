@@ -97,6 +97,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     authenticate();
   }, [devLogin]);
 
+  useEffect(() => {
+    if (!token) return;
+    const interval = setInterval(() => {
+      refreshUser();
+    }, 10000); // 10 seconds polling for real-time balance
+
+    return () => clearInterval(interval);
+  }, [token, refreshUser]);
+
   return (
     <AuthContext.Provider
       value={{

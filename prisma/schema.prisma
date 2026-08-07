@@ -23,6 +23,7 @@ model User {
   orders        Order[]
   transactions  Transaction[]
   topUpRequests TopUpRequest[]
+  productOrders ProductOrder[]
 }
 
 model Account {
@@ -115,6 +116,7 @@ enum TransactionType {
   ESCROW_RELEASE
   REFUND
   ADMIN_ADJUST
+  PRODUCT_PURCHASE
 }
 
 enum PaymentProvider {
@@ -199,4 +201,47 @@ enum TopUpStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+model Product {
+  id            String          @id @default(uuid())
+  category      ProductCategory
+  name          String
+  amount        Int
+  price         Decimal         @db.Decimal(10, 2)
+  imageUrl      String?
+  isActive      Boolean         @default(true)
+  sortOrder     Int             @default(0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  productOrders ProductOrder[]
+}
+
+enum ProductCategory {
+  UC
+  STARS
+}
+
+model ProductOrder {
+  id                 String             @id @default(uuid())
+  orderNumber        String             @unique
+  userId             String
+  user               User               @relation(fields: [userId], references: [id])
+  productId          String
+  product            Product            @relation(fields: [productId], references: [id])
+  quantity           Int                @default(1)
+  amount             Decimal            @db.Decimal(10, 2)
+  status             ProductOrderStatus @default(PENDING)
+  playerIdOrUsername String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  deliveredAt        DateTime?
+}
+
+enum ProductOrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
 }

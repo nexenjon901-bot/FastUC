@@ -11,6 +11,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { TopupModule } from './topup/topup.module';
 import { AdminModule } from './admin/admin.module';
 import { BotModule } from './bot/bot.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { BotModule } from './bot/bot.module';
     TopupModule,
     AdminModule,
     BotModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

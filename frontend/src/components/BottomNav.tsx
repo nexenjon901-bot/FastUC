@@ -40,14 +40,14 @@ const BottomNav: React.FC = () => {
             <button
               key={tab.path}
               onClick={() => navigate(tab.path)}
-              className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${active ? 'text-[#3b82f6]' : 'text-[#8b92b8] hover:text-[#a5b4fc]'}`}
+              className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${active ? 'text-[#7C7FF5]' : 'text-[#8b92b8] hover:text-[#a5b4fc]'}`}
             >
               <Icon 
                 size={22} 
-                strokeWidth={active ? 2.5 : 2} 
-                className={active ? 'text-[#3b82f6]' : 'text-[#8b92b8]'}
+                strokeWidth={active ? 3 : 2} 
+                className={active ? 'text-[#7C7FF5] drop-shadow-[0_0_8px_rgba(124,127,245,0.6)]' : 'text-[#8b92b8]'}
               />
-              <span className={`text-[10px] font-bold ${active ? 'text-[#3b82f6]' : 'text-[#8b92b8]'}`}>
+              <span className={`text-[10px] font-bold ${active ? 'text-[#7C7FF5]' : 'text-[#8b92b8]'}`}>
                 {tab.label}
               </span>
             </button>

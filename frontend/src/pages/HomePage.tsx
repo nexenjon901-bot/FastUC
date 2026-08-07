@@ -20,6 +20,17 @@ interface Account {
   linkedAccounts?: string[];
 }
 
+interface Product {
+  id: string;
+  name: string;
+  category: 'UC' | 'STARS';
+  amount: number;
+  price: string;
+  imageUrl?: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
 const DEMO_ACCOUNTS: Account[] = [
   {
     id: '1', sku: 'PG-001',
@@ -41,14 +52,26 @@ const HomePage: React.FC = () => {
   const [accounts, setAccounts] = useState<Account[]>(DEMO_ACCOUNTS);
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState(0);
+  const [ucProducts, setUcProducts] = useState<Product[]>([]);
+  const [starsProducts, setStarsProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    // Try to load real data, fallback to demo
+    // Load PUBG accounts
     setLoading(true);
     api.get('/accounts')
       .then(res => { if (res.data?.length) setAccounts(res.data); })
       .catch(() => {})
       .finally(() => setLoading(false));
+
+    // Load UC products
+    api.get('/products?category=UC')
+      .then(res => setUcProducts(res.data || []))
+      .catch(() => {});
+
+    // Load Stars products
+    api.get('/products?category=STARS')
+      .then(res => setStarsProducts(res.data || []))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -145,35 +168,53 @@ const HomePage: React.FC = () => {
         {/* PUBG UC Section */}
         <div className="mt-8 mb-4">
           <h2 className="section-title">PUBG UC Xarid qilish</h2>
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="card p-3 cursor-pointer active:scale-95 transition-transform text-center flex flex-col items-center justify-center bg-[#1e2040]">
-                {/* Placeholder for UC image */}
-                <div className="w-16 h-16 bg-[#12132b] rounded-full mb-2 flex items-center justify-center text-[#facc15] font-black text-xs border border-[#facc15]/20">
-                  UC Logo
+          {ucProducts.length === 0 ? (
+            <p className="text-[#8b92b8] text-sm text-center mt-4">Mahsulotlar yuklanmoqda...</p>
+          ) : (
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              {ucProducts.map((product) => (
+                <div
+                  key={product.id}
+                  onClick={() => navigate(`/products/${product.id}`)}
+                  className="card p-3 cursor-pointer active:scale-95 transition-transform text-center flex flex-col items-center justify-center bg-[#1e2040]"
+                >
+                  {product.imageUrl ? (
+                    <img src={product.imageUrl} alt={product.name} className="w-14 h-14 object-cover rounded-xl mb-2" />
+                  ) : (
+                    <div className="w-14 h-14 bg-[#12132b] rounded-xl mb-2 flex items-center justify-center text-[#facc15] text-2xl">💎</div>
+                  )}
+                  <p className="text-white font-bold text-xs leading-tight">{product.name}</p>
+                  <p className="text-[#facc15] text-xs font-black mt-0.5">{Number(product.price).toLocaleString()} UZS</p>
                 </div>
-                <p className="text-white font-bold text-sm">60 UC</p>
-                <p className="text-[#facc15] text-xs font-black">15,000 UZS</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Telegram Stars Section */}
         <div className="mt-8 mb-4">
-          <h2 className="section-title text-blue-400">Telegram Stars</h2>
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            {[1, 2].map((i) => (
-              <div key={i} className="card p-3 cursor-pointer active:scale-95 transition-transform text-center flex flex-col items-center justify-center bg-blue-500/10 border border-blue-500/20">
-                {/* Placeholder for Stars image */}
-                <div className="w-16 h-16 bg-[#12132b] rounded-full mb-2 flex items-center justify-center text-blue-400 font-black text-xs border border-blue-400/20">
-                  ⭐️ Star
+          <h2 className="section-title" style={{ color: '#a78bfa' }}>⭐ Telegram Stars</h2>
+          {starsProducts.length === 0 ? (
+            <p className="text-[#8b92b8] text-sm text-center mt-4">Mahsulotlar yuklanmoqda...</p>
+          ) : (
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              {starsProducts.map((product) => (
+                <div
+                  key={product.id}
+                  onClick={() => navigate(`/products/${product.id}`)}
+                  className="card p-3 cursor-pointer active:scale-95 transition-transform text-center flex flex-col items-center justify-center bg-purple-500/10 border border-purple-500/20"
+                >
+                  {product.imageUrl ? (
+                    <img src={product.imageUrl} alt={product.name} className="w-14 h-14 object-cover rounded-xl mb-2" />
+                  ) : (
+                    <div className="w-14 h-14 bg-[#12132b] rounded-xl mb-2 flex items-center justify-center text-purple-400 text-2xl">⭐</div>
+                  )}
+                  <p className="text-white font-bold text-xs leading-tight">{product.name}</p>
+                  <p className="text-purple-400 text-xs font-black mt-0.5">{Number(product.price).toLocaleString()} UZS</p>
                 </div>
-                <p className="text-white font-bold text-sm">50 Stars</p>
-                <p className="text-blue-400 text-xs font-black">12,000 UZS</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>

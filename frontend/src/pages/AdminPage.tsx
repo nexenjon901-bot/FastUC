@@ -7,7 +7,7 @@ import {
   Eye, EyeOff, ExternalLink, ImagePlus, AlertTriangle
 } from 'lucide-react';
 
-type Tab = 'dashboard' | 'orders' | 'topups' | 'accounts';
+type Tab = 'dashboard' | 'orders' | 'topups' | 'accounts' | 'products';
 
 const RANKS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Crown', 'Ace', 'Ace Master', 'Ace Dominator', 'Conqueror'];
 
@@ -46,6 +46,13 @@ const AdminPage: React.FC = () => {
     sku: '', title: '', rank: 'Ace', level: 50, skinsCount: 20,
     ucBalance: 0, price: 100000, description: '', login: '', password: '',
   });
+  const [products, setProducts] = useState<any[]>([]);
+  const [productOrders, setProductOrders] = useState<any[]>([]);
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [productForm, setProductForm] = useState({
+    category: 'UC', name: '', amount: 0, price: 0, imageUrl: '', sortOrder: 0,
+  });
 
   const showMsg = (m: string) => {
     setMsg(m);
@@ -69,6 +76,15 @@ const AdminPage: React.FC = () => {
       setTopups(t.data || []);
       setStats(s.data || null);
       setAccounts(a.data || []);
+      // Load products and product orders
+      try {
+        const [pr, po] = await Promise.all([
+          adminApi.get('/admin/products'),
+          adminApi.get('/admin/products/orders'),
+        ]);
+        setProducts(pr.data || []);
+        setProductOrders(po.data || []);
+      } catch { /* ignore */ }
     } catch (err: any) {
       if (err.response?.status === 401) { localStorage.removeItem('admin_token'); setToken(null); }
     } finally {
@@ -177,6 +193,7 @@ const AdminPage: React.FC = () => {
     { id: 'orders' as Tab, label: 'Buyurtmalar', icon: <ShoppingBag size={18} />, badge: orders.filter(o => ['ESCROW_HELD','ADMIN_REVIEW','DISPUTED'].includes(o.status)).length },
     { id: 'topups' as Tab, label: 'To\'lovlar', icon: <CreditCard size={18} />, badge: topups.filter(t => t.status === 'PENDING').length },
     { id: 'accounts' as Tab, label: 'Akkauntlar', icon: <Package size={18} /> },
+    { id: 'products' as Tab, label: 'UC/Stars', icon: <TrendingUp size={18} />, badge: productOrders.filter(o => o.status === 'PENDING').length },
   ];
 
   // LOGIN PAGE
@@ -686,6 +703,154 @@ const AdminPage: React.FC = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+        )}
+
+        {/* ─── PRODUCTS TAB ─────────────────────────────────────────── */}
+        {tab === 'products' && (
+          <div className="space-y-6">
+            {/* Product form */}
+            <div className="bg-[#111827] rounded-2xl p-5 border border-white/5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-white font-bold">
+                  {showProductForm ? (editingProductId ? 'Mahsulotni tahrirlash' : 'Yangi mahsulot') : 'Mahsulotlar'}
+                </h3>
+                <button
+                  onClick={() => { setShowProductForm(!showProductForm); setEditingProductId(null); setProductForm({ category: 'UC', name: '', amount: 0, price: 0, imageUrl: '', sortOrder: 0 }); }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#6366f1] text-white text-sm font-semibold rounded-lg hover:bg-[#4f52d0] transition-colors"
+                >
+                  <Plus size={14} /> {showProductForm ? 'Bekor qilish' : 'Qo\'shish'}
+                </button>
+              </div>
+
+              {showProductForm && (
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  try {
+                    if (editingProductId) {
+                      await adminApi.put(`/admin/products/${editingProductId}`, { ...productForm, amount: Number(productForm.amount), price: Number(productForm.price), sortOrder: Number(productForm.sortOrder) });
+                      showMsg('✅ Mahsulot yangilandi');
+                    } else {
+                      await adminApi.post('/admin/products', { ...productForm, amount: Number(productForm.amount), price: Number(productForm.price), sortOrder: Number(productForm.sortOrder) });
+                      showMsg('✅ Mahsulot qo\'shildi');
+                    }
+                    setShowProductForm(false); setEditingProductId(null);
+                    loadData();
+                  } catch (err: any) { showErr(err.response?.data?.message || 'Xatolik'); }
+                }} className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[#9ca3af] text-xs font-semibold uppercase tracking-wider block mb-1">Kategoriya</label>
+                      <select value={productForm.category} onChange={e => setProductForm(f => ({ ...f, category: e.target.value }))}
+                        className="w-full bg-[#0f172a] text-white px-3 py-2 rounded-xl border border-white/8 outline-none focus:border-[#6366f1] text-sm">
+                        <option value="UC">PUBG UC</option>
+                        <option value="STARS">Telegram Stars</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[#9ca3af] text-xs font-semibold uppercase tracking-wider block mb-1">Nomi</label>
+                      <input value={productForm.name} onChange={e => setProductForm(f => ({ ...f, name: e.target.value }))}
+                        className="w-full bg-[#0f172a] text-white px-3 py-2 rounded-xl border border-white/8 outline-none focus:border-[#6366f1] text-sm" placeholder="60 UC" required />
+                    </div>
+                    <div>
+                      <label className="text-[#9ca3af] text-xs font-semibold uppercase tracking-wider block mb-1">Miqdor</label>
+                      <input type="number" value={productForm.amount} onChange={e => setProductForm(f => ({ ...f, amount: Number(e.target.value) }))}
+                        className="w-full bg-[#0f172a] text-white px-3 py-2 rounded-xl border border-white/8 outline-none focus:border-[#6366f1] text-sm" placeholder="60" required />
+                    </div>
+                    <div>
+                      <label className="text-[#9ca3af] text-xs font-semibold uppercase tracking-wider block mb-1">Narx (UZS)</label>
+                      <input type="number" value={productForm.price} onChange={e => setProductForm(f => ({ ...f, price: Number(e.target.value) }))}
+                        className="w-full bg-[#0f172a] text-white px-3 py-2 rounded-xl border border-white/8 outline-none focus:border-[#6366f1] text-sm" placeholder="15000" required />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[#9ca3af] text-xs font-semibold uppercase tracking-wider block mb-1">Rasm URL (ixtiyoriy)</label>
+                    <input value={productForm.imageUrl} onChange={e => setProductForm(f => ({ ...f, imageUrl: e.target.value }))}
+                      className="w-full bg-[#0f172a] text-white px-3 py-2 rounded-xl border border-white/8 outline-none focus:border-[#6366f1] text-sm" placeholder="https://..." />
+                  </div>
+                  <button type="submit" className="w-full py-2.5 bg-[#6366f1] hover:bg-[#4f52d0] text-white font-bold rounded-xl transition-colors text-sm">
+                    {editingProductId ? 'Yangilash' : 'Qo\'shish'}
+                  </button>
+                </form>
+              )}
+
+              {/* Products list */}
+              {!showProductForm && (
+                <div className="space-y-2 mt-2">
+                  {products.length === 0 ? (
+                    <p className="text-[#6b7280] text-sm text-center py-4">Mahsulotlar yo'q. Yuqorida "Qo'shish" ni bosing.</p>
+                  ) : products.map(prod => (
+                    <div key={prod.id} className="flex items-center justify-between p-3 bg-[#0f172a] rounded-xl border border-white/5">
+                      <div className="flex items-center gap-3">
+                        {prod.imageUrl ? (
+                          <img src={prod.imageUrl} alt={prod.name} className="w-10 h-10 rounded-lg object-cover" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-lg bg-[#1e2040] flex items-center justify-center text-xl">
+                            {prod.category === 'UC' ? '💎' : '⭐'}
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-white font-semibold text-sm">{prod.name}</p>
+                          <p className="text-[#6b7280] text-xs">{prod.category} · {Number(prod.price).toLocaleString()} UZS · {prod.isActive ? '✅ Faol' : '⛔ Nofaol'}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => { setProductForm({ category: prod.category, name: prod.name, amount: prod.amount, price: Number(prod.price), imageUrl: prod.imageUrl || '', sortOrder: prod.sortOrder }); setEditingProductId(prod.id); setShowProductForm(true); }}
+                          className="p-1.5 text-[#a5b4fc] hover:bg-[#1e2040] rounded-lg transition-colors"><Pencil size={14} /></button>
+                        <button onClick={async () => { if (!confirm('O\'chirmoqchimisiz?')) return; await adminApi.delete(`/admin/products/${prod.id}`); showMsg('O\'chirildi'); loadData(); }}
+                          className="p-1.5 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 size={14} /></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Product Orders */}
+            <div className="bg-[#111827] rounded-2xl p-5 border border-white/5">
+              <h3 className="text-white font-bold mb-4">Kutilayotgan UC/Stars buyurtmalari
+                {productOrders.filter(o => o.status === 'PENDING').length > 0 && (
+                  <span className="ml-2 bg-yellow-500/20 text-yellow-400 text-xs px-2 py-0.5 rounded-full">
+                    {productOrders.filter(o => o.status === 'PENDING').length} kutilmoqda
+                  </span>
+                )}
+              </h3>
+              <div className="space-y-3">
+                {productOrders.length === 0 ? (
+                  <p className="text-[#6b7280] text-sm text-center py-4">Buyurtmalar yo'q</p>
+                ) : productOrders.map(po => (
+                  <div key={po.id} className="p-4 bg-[#0f172a] rounded-xl border border-white/5">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-white font-semibold text-sm">{po.product?.name}</p>
+                        <code className="text-[#6b7280] text-xs">{po.orderNumber}</code>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${statusColors[po.status] || 'bg-gray-500/10 text-gray-400 border-gray-500/20'}`}>
+                        {po.status}
+                      </span>
+                    </div>
+                    <div className="text-xs text-[#9ca3af] space-y-1 mb-3">
+                      <p>👤 {po.user?.firstName || po.user?.username} (@{po.user?.username})</p>
+                      <p>🎮 {po.playerIdOrUsername ? `ID/Username: ${po.playerIdOrUsername}` : '—'}</p>
+                      <p>💰 {Number(po.amount).toLocaleString()} UZS · Miqdor: {po.quantity}</p>
+                    </div>
+                    {po.status === 'PENDING' && (
+                      <button
+                        onClick={async () => {
+                          await adminApi.patch(`/admin/products/orders/${po.id}/deliver`);
+                          showMsg(`✅ ${po.product?.name} yetkazildi`);
+                          loadData();
+                        }}
+                        className="w-full py-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-semibold hover:bg-emerald-500/20 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Check size={14} /> Yetkazildi deb belgilash
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
