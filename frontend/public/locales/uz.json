@@ -1,75 +1,73 @@
 {
-  "uz": {
-    "home": {
-      "title": "PUBG Akkauntlar",
-      "search": "Qidirish...",
-      "filter": "Filtr",
-      "escrowBanner": "Escrow himoyasi bilan xavfsiz xarid",
-      "buy": "Xavfsiz xarid qilish",
-      "noAccounts": "Akkauntlar topilmadi"
+  "home": {
+    "title": "PUBG Akkauntlar",
+    "search": "Qidirish...",
+    "filter": "Filtr",
+    "escrowBanner": "Escrow himoyasi bilan xavfsiz xarid",
+    "buy": "Xavfsiz xarid qilish",
+    "noAccounts": "Akkauntlar topilmadi"
+  },
+  "account": {
+    "rank": "Daraja",
+    "level": "Level",
+    "skins": "Skinlar",
+    "uc": "UC Balans",
+    "buyNow": "Xavfsiz xarid qilish",
+    "description": "Tavsif",
+    "escrowProtected": "Escrow orqali himoyalangan"
+  },
+  "balance": {
+    "title": "Balans",
+    "currentBalance": "Joriy Balans",
+    "topUp": "Hisobni to'ldirish",
+    "method": "To'lov usuli",
+    "amount": "Summa (UZS)",
+    "amountPlaceholder": "Miqdorni kiriting",
+    "proofImage": "Chek/skrinshot URL",
+    "proofPlaceholder": "Chek URL sini kiriting",
+    "submit": "So'rov yuborish",
+    "pending": "Kutilmoqda",
+    "approved": "Tasdiqlangan",
+    "rejected": "Rad etilgan"
+  },
+  "orders": {
+    "title": "Buyurtmalar",
+    "status": {
+      "PENDING_PAYMENT": "To'lov kutilmoqda",
+      "ESCROW_HELD": "Escrowda",
+      "ADMIN_REVIEW": "Admin tekshirmoqda",
+      "CREDENTIALS_SENT": "Login yuborildi",
+      "BUYER_CONFIRMED": "Tasdiqlangan",
+      "COMPLETED": "Yakunlandi",
+      "DISPUTED": "Nizo",
+      "CANCELLED": "Bekor qilindi",
+      "REFUNDED": "Qaytarildi"
     },
-    "account": {
-      "rank": "Daraja",
-      "level": "Level",
-      "skins": "Skinlar",
-      "uc": "UC Balans",
-      "buyNow": "Xavfsiz xarid qilish",
-      "description": "Tavsif",
-      "escrowProtected": "Escrow orqali himoyalangan"
-    },
-    "balance": {
-      "title": "Balans",
-      "currentBalance": "Joriy Balans",
-      "topUp": "Hisobni to'ldirish",
-      "method": "To'lov usuli",
-      "amount": "Summa (UZS)",
-      "amountPlaceholder": "Miqdorni kiriting",
-      "proofImage": "Chek/skrinshot URL",
-      "proofPlaceholder": "Chek URL sini kiriting",
-      "submit": "So'rov yuborish",
-      "pending": "Kutilmoqda",
-      "approved": "Tasdiqlangan",
-      "rejected": "Rad etilgan"
-    },
-    "orders": {
-      "title": "Buyurtmalar",
-      "status": {
-        "PENDING_PAYMENT": "To'lov kutilmoqda",
-        "ESCROW_HELD": "Escrowda",
-        "ADMIN_REVIEW": "Admin tekshirmoqda",
-        "CREDENTIALS_SENT": "Login yuborildi",
-        "BUYER_CONFIRMED": "Tasdiqlangan",
-        "COMPLETED": "Yakunlandi",
-        "DISPUTED": "Nizo",
-        "CANCELLED": "Bekor qilindi",
-        "REFUNDED": "Qaytarildi"
-      },
-      "confirm": "Qabul qildim",
-      "dispute": "Muammo bor",
-      "empty": "Buyurtmalar yo'q"
-    },
-    "profile": {
-      "title": "Profil",
-      "id": "ID",
-      "balance": "Balans",
-      "totalOrders": "Jami buyurtmalar",
-      "language": "Til",
-      "logout": "Chiqish"
-    },
-    "escrow": {
-      "title": "Escrow jarayoni",
-      "step1": "To'lov qabul qilindi",
-      "step2": "Admin tekshirmoqda",
-      "step3": "Login/parol yuborildi",
-      "step4": "Xaridor tasdiqladi",
-      "credentialsTitle": "Akkaunt ma'lumotlari",
-      "credentialsWarning": "Bu ma'lumotlar 60 soniyadan keyin yashiriladi!"
-    },
-    "nav": {
-      "home": "Bosh sahifa",
-      "balance": "Balans",
-      "orders": "Tarix",
-      "profile": "Profil"
-    }
+    "confirm": "Qabul qildim",
+    "dispute": "Muammo bor",
+    "empty": "Buyurtmalar yo'q"
+  },
+  "profile": {
+    "title": "Profil",
+    "id": "ID",
+    "balance": "Balans",
+    "totalOrders": "Jami buyurtmalar",
+    "language": "Til",
+    "logout": "Chiqish"
+  },
+  "escrow": {
+    "title": "Escrow jarayoni",
+    "step1": "To'lov qabul qilindi",
+    "step2": "Admin tekshirmoqda",
+    "step3": "Login/parol yuborildi",
+    "step4": "Xaridor tasdiqladi",
+    "credentialsTitle": "Akkaunt ma'lumotlari",
+    "credentialsWarning": "Bu ma'lumotlar 60 soniyadan keyin yashiriladi!"
+  },
+  "nav": {
+    "home": "Asosiy",
+    "balance": "Balans",
+    "orders": "Buyurtmalar",
+    "profile": "Profil"
   }
 }

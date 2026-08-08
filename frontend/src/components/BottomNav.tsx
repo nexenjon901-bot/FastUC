@@ -60,11 +60,11 @@ const BottomNav: React.FC = () => {
           <button
             key={path}
             onClick={() => navigate(path)}
-            className={`nav-item ${isActive ? 'active' : ''}`}
+            className={`nav-item flex flex-col items-center gap-1 ${isActive ? 'active' : ''}`}
             id={`nav-${path.replace('/', '') || 'home'}`}
           >
             <Icon active={isActive} />
-            <span className="font-medium">{t(labelKey)}</span>
+            <span className="font-medium text-[10px]">{t(labelKey)}</span>
             {isActive && (
               <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent-indigo" />
             )}

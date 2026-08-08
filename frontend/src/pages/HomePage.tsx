@@ -85,13 +85,13 @@ const HomePage: React.FC = () => {
 
         {/* PUBG MOBILE Banner */}
         {isLoading ? (
-          <div className="shimmer h-52 w-full rounded-3xl mb-8"></div>
+          <div className="shimmer h-40 w-full rounded-3xl mb-8"></div>
         ) : (
           <div 
             onClick={handleAccountsClick}
-            className="relative w-full h-52 rounded-3xl overflow-hidden mb-8 group cursor-pointer shadow-2xl border border-white/5 active:scale-[0.98] transition-transform"
+            className="relative w-full h-40 rounded-3xl overflow-hidden mb-8 group cursor-pointer shadow-2xl border border-white/5 active:scale-[0.98] transition-transform"
           >
-            <img src="https://i.ytimg.com/vi/F2n1zB3OepA/maxresdefault.jpg" alt="PUBG" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <img src="https://wallpaperaccess.com/full/1636859.jpg" alt="PUBG" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
             
             <div className="absolute inset-0 bg-gradient-to-br from-[#5a67d8]/10 to-transparent" />
@@ -99,7 +99,7 @@ const HomePage: React.FC = () => {
             <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
               <div>
                 <span className="text-[#facc15] text-xs font-bold uppercase tracking-widest block mb-1">Akkauntlar</span>
-                <h2 className="text-white font-black text-3xl tracking-wide uppercase drop-shadow-lg">PUBG MOBILE</h2>
+                <h2 className="text-white font-black text-2xl tracking-wide uppercase drop-shadow-lg">PUBG MOBILE</h2>
               </div>
               <button className="bg-gradient-to-r from-[#facc15] to-[#eab308] text-black font-black px-5 py-2.5 rounded-2xl text-sm shadow-lg hover:scale-105 transition-transform active:scale-95">
                 Ko'rish →

@@ -7,12 +7,16 @@ const ProfilePage: React.FC = () => {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    api.get('/users/me')
-      .then(res => {
-        setBalance(res.data.balance || 0);
+    const fetchUser = async () => {
+      try {
+        const res = await api.get('/users/me');
+        setBalance(Number(res.data.balance) || 0);
         setUser(res.data);
-      })
-      .catch(() => {});
+      } catch (e) {}
+    };
+    fetchUser();
+    const interval = setInterval(fetchUser, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const triggerHaptic = () => {

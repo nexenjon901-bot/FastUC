@@ -1,10 +1,11 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as TelegramBot from 'node-telegram-bot-api';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const TelegramBot = require('node-telegram-bot-api');
 
 @Injectable()
 export class BotService implements OnModuleInit {
-  private bot: TelegramBot;
+  private bot: any;
   private readonly logger = new Logger(BotService.name);
 
   constructor(private configService: ConfigService) {}
