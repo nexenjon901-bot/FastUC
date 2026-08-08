@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
-import Header from '../components/Header';
 
 const UC_PACKAGES = [
   { id: 1, uc: 60,   price: 12000  },
