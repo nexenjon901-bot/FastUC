@@ -9,11 +9,13 @@ import { OrdersModule } from './orders/orders.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { TopupModule } from './topup/topup.module';
 import { AdminModule } from './admin/admin.module';
+import { BotModule } from './bot/bot.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    BotModule,
     UsersModule,
     AuthModule,
     OrdersModule,
@@ -25,3 +27,4 @@ import { AdminModule } from './admin/admin.module';
   providers: [AppService],
 })
 export class AppModule {}
+

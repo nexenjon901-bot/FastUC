@@ -10,6 +10,10 @@ export class TopupService {
     if (amount <= 0) {
       throw new BadRequestException('Amount must be positive');
     }
+
+    if (amount < 5000) {
+      throw new BadRequestException("Minimal to'lov miqdori 5,000 UZS bo'lishi kerak");
+    }
     
     // Check if the provider is valid
     if (!Object.values(PaymentProvider).includes(method as any)) {

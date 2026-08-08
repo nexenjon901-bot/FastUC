@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrderStatus, AccountStatus, TransactionType } from '@prisma/client';
 
@@ -91,6 +91,44 @@ export class OrdersService {
       // but if we did, we would create an ESCROW_RELEASE transaction for the admin here.
 
       return updatedOrder;
+    });
+  }
+
+  async findAll(userId: string) {
+    return this.prisma.order.findMany({
+      where: { buyerId: userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        account: {
+          select: { title: true, rank: true, images: true },
+        },
+      },
+    });
+  }
+
+  async findOne(userId: string, orderId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        account: {
+          select: { title: true, rank: true, images: true },
+        },
+      },
+    });
+    if (!order) throw new NotFoundException('Order not found');
+    if (order.buyerId !== userId) throw new ForbiddenException('Access denied');
+    return order;
+  }
+
+  async disputeOrder(userId: string, orderId: string, reason: string) {
+    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    if (!order || order.buyerId !== userId) throw new NotFoundException('Order not found');
+    if (order.status === OrderStatus.COMPLETED || order.status === OrderStatus.CANCELLED) {
+      throw new BadRequestException('Cannot dispute this order');
+    }
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { status: OrderStatus.DISPUTED } as any,
     });
   }
 }

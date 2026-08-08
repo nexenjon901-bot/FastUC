@@ -1,19 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #1c1d33;
-  --color-bg-card: #272945;
-  --color-bg-card2: #242746;
-  --color-accent-indigo: #facc15;
-  --color-accent-violet: #fbbf24;
+  --color-bg: #0f111a;
+  --color-bg-card: #16192b;
+  --color-bg-card2: #1d2138;
+  --color-accent-indigo: #5a67d8;
+  --color-accent-violet: #7c3aed;
   --color-success: #10b981;
   --color-warning: #facc15;
   --color-danger: #f43f5e;
   --color-primary: #ffffff;
   --color-secondary: #94a3b8;
 
-  --font-sans: 'Inter', 'Manrope', system-ui, sans-serif;
+  --font-sans: 'Outfit', 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Mono', monospace;
 
   --radius-2xl: 1rem;
@@ -36,14 +36,14 @@
   }
 
   body {
-    background-color: #1c1d33;
+    background-color: #0f111a;
     color: #ffffff;
-    font-family: 'Inter', 'Manrope', system-ui, sans-serif;
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
   }
 
   ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: #141631; }
-  ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 2px; }
+  ::-webkit-scrollbar-track { background: #16192b; }
+  ::-webkit-scrollbar-thumb { background: #5a67d8; border-radius: 2px; }
 }
 
 /* Reusable component classes */
@@ -165,7 +165,7 @@
 
 .page-container {
   min-height: 100vh;
-  background: #1c1d33;
+  background: #0f111a;
   padding: 1rem 1rem 6rem;
 }
 
@@ -189,8 +189,8 @@
 }
 
 .shimmer {
-  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  background: linear-gradient(90deg, #141631 0%, #171933 50%, #141631 100%);
+  animation: shimmerAnim 1.8s ease-in-out infinite;
+  background: linear-gradient(90deg, #16192b 0%, #1d2138 50%, #16192b 100%);
   background-size: 200% 100%;
 }
 
@@ -234,3 +234,14 @@
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+
+@keyframes shimmerAnim {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
