@@ -2,11 +2,11 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0f111a;
-  --color-bg-card: #16192b;
-  --color-bg-card2: #1d2138;
-  --color-accent-indigo: #5a67d8;
-  --color-accent-violet: #7c3aed;
+  --color-bg: #0b0e17;
+  --color-bg-card: #151a2d;
+  --color-bg-card2: #1c2340;
+  --color-accent-indigo: #6672e8;
+  --color-accent-violet: #864cf5;
   --color-success: #10b981;
   --color-warning: #facc15;
   --color-danger: #f43f5e;
@@ -36,9 +36,10 @@
   }
 
   body {
-    background-color: #0f111a;
+    background-color: #0b0e17;
     color: #ffffff;
     font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.01em;
   }
 
   ::-webkit-scrollbar { width: 4px; }
@@ -48,10 +49,11 @@
 
 /* Reusable component classes */
 .card {
-  background: #141631;
-  border-radius: 1rem;
+  background: #151a2d;
+  border-radius: 1.25rem;
   padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(139, 151, 255, 0.12);
+  box-shadow: 0 12px 32px rgba(3, 6, 18, 0.18);
 }
 
 .btn-primary {
@@ -138,12 +140,13 @@
 .bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background: rgba(15, 17, 26, 0.97);
-  backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  min-height: 76px;
+  background: rgba(11, 14, 23, 0.94);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(139, 151, 255, 0.14);
   display: flex;
   z-index: 50;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding: 0.35rem 0 env(safe-area-inset-bottom, 0px);
 }
 
 .nav-item {
@@ -166,8 +169,8 @@
 
 .page-container {
   min-height: 100vh;
-  background: #0f111a;
-  padding: 1rem 1rem 6rem;
+  background: #0b0e17;
+  padding: 1rem 1rem 7rem;
 }
 
 .section-title {
