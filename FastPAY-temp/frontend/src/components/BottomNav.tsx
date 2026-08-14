@@ -1,89 +1,80 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+const navItems = [
+  { path: '/', labelKey: 'nav.home', label: 'Bosh sahifa', icon: HomeIcon },
+  { path: '/balance', labelKey: 'nav.balance', label: 'Balans', icon: WalletIcon },
+  { path: '/orders', labelKey: 'nav.orders', label: 'Tarix', icon: HistoryIcon },
+  { path: '/profile', labelKey: 'nav.profile', label: 'Profil', icon: UserIcon },
+];
+
+const ACTIVE_COLOR = '#737DE4';
+const MUTED_COLOR = '#858BB8';
+
+function HomeIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+      <path d="M3 12L12 3l9 9" stroke={active ? ACTIVE_COLOR : MUTED_COLOR} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9 21V12h6v9" stroke={active ? ACTIVE_COLOR : MUTED_COLOR} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+function WalletIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+      <rect x="2" y="7" width="20" height="14" rx="3" stroke={active ? ACTIVE_COLOR : MUTED_COLOR} strokeWidth="2"/>
+      <circle cx="16" cy="14" r="1.5" fill={active ? ACTIVE_COLOR : MUTED_COLOR}/>
+      <path d="M2 10V7a3 3 0 013-3h14a3 3 0 013 3v3" stroke={active ? ACTIVE_COLOR : MUTED_COLOR} strokeWidth="2"/>
+    </svg>
+  );
+}
+
+function HistoryIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke={active ? ACTIVE_COLOR : MUTED_COLOR} strokeWidth="2" strokeLinecap="round"/>
+      <rect x="9" y="3" width="6" height="4" rx="1" stroke={active ? ACTIVE_COLOR : MUTED_COLOR} strokeWidth="2"/>
+      <path d="M9 12h6M9 16h4" stroke={active ? ACTIVE_COLOR : MUTED_COLOR} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+function UserIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4" stroke={active ? ACTIVE_COLOR : MUTED_COLOR} strokeWidth="2"/>
+      <path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" stroke={active ? ACTIVE_COLOR : MUTED_COLOR} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  );
+}
 
 const BottomNav: React.FC = () => {
+  const { t } = useTranslation();
+  const location = useLocation();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-
-  const tabs = [
-    {
-      path: '/',
-      label: 'Bosh Sahifa',
-      icon: (active: boolean) => (
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-          <path
-            d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill={active ? 'currentColor' : 'none'}
-            fillOpacity={active ? 0.15 : 0}
-          />
-          <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      ),
-    },
-    {
-      path: '/balance',
-      label: 'Balans',
-      icon: (active: boolean) => (
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-          <rect
-            x="2" y="7" width="20" height="14" rx="2"
-            stroke="currentColor" strokeWidth="2.2"
-            fill={active ? 'currentColor' : 'none'}
-            fillOpacity={active ? 0.15 : 0}
-          />
-          <path d="M16 3H8L2 7h20l-6-4z" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round"/>
-          <circle cx="17" cy="15" r="1.5" fill="currentColor"/>
-        </svg>
-      ),
-    },
-    {
-      path: '/orders',
-      label: 'Tarix',
-      icon: (active: boolean) => (
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-          <circle
-            cx="12" cy="12" r="10"
-            stroke="currentColor" strokeWidth="2.2"
-            fill={active ? 'currentColor' : 'none'}
-            fillOpacity={active ? 0.15 : 0}
-          />
-          <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      ),
-    },
-    {
-      path: '/profile',
-      label: 'Profil',
-      icon: (active: boolean) => (
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-          <circle
-            cx="12" cy="8" r="4"
-            stroke="currentColor" strokeWidth="2.2"
-            fill={active ? 'currentColor' : 'none'}
-            fillOpacity={active ? 0.15 : 0}
-          />
-          <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>
-        </svg>
-      ),
-    },
-  ];
 
   return (
     <nav className="bottom-nav">
-      {tabs.map((tab) => {
-        const active = pathname === tab.path;
+      {navItems.map(({ path, icon: Icon, labelKey, label }) => {
+        const isActive = location.pathname === path;
         return (
           <button
-            key={tab.path}
-            onClick={() => navigate(tab.path)}
-            className={`nav-item ${active ? 'active' : ''}`}
+            key={path}
+            onClick={() => navigate(path)}
+            className={`nav-item ${isActive ? 'active' : ''}`}
+            id={`nav-${path.replace('/', '') || 'home'}`}
           >
-            {tab.icon(active)}
-            <span>{tab.label}</span>
+            <Icon active={isActive} />
+            <span style={{ fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.2px' }}>
+              {t(labelKey, label)}
+            </span>
+            {isActive && (
+              <span
+                style={{ background: '#737DE4', width: 4, height: 4, borderRadius: '50%', position: 'absolute', bottom: 4 }}
+              />
+            )}
           </button>
         );
       })}
