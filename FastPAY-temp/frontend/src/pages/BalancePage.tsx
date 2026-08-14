@@ -19,13 +19,13 @@ const PAYMENT_DURATION = 15 * 60; // 15 daqiqa soniyada
 
 const BalancePage: React.FC = () => {
   const navigate = useNavigate();
-  const [balance, setBalance] = useState(0);
+  const [balance] = useState(0);
   const [step, setStep] = useState<Step>('method');
-  const [method, setMethod] = useState<'uzcard' | 'bankomat' | null>(null);
+  const [, setMethod] = useState<'uzcard' | 'bankomat' | null>(null);
   const [amount, setAmount] = useState('');
   const [timeLeft, setTimeLeft] = useState(PAYMENT_DURATION);
   const [copied, setCopied] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (step === 'card') {

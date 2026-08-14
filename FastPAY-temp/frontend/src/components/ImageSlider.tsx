@@ -19,7 +19,6 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images, title }) => {
   };
 
   const handleTouchStart = React.useRef<number>(0);
-  const handleTouchMove = React.useRef<number>(0);
 
   return (
     <div className="relative w-full h-52 overflow-hidden rounded-2xl select-none"
