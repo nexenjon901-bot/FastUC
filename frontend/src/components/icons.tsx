@@ -55,7 +55,6 @@ export const CardsIcon: React.FC<IconProps> = ({ size = 48, className }) => (
       height: size,
       objectFit: 'contain',
       display: 'block',
-      mixBlendMode: 'multiply',
     }}
     draggable={false}
   />
