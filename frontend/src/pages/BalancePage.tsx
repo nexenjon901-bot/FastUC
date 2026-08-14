@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, CreditCard, Landmark } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import { useApp } from '../context/AppContext';
 import { formatUzs } from '../api/services';
+import { CardsIcon, AtmIcon } from '../components/icons';
 
 const BalancePage: React.FC = () => {
   const { user } = useApp();
@@ -24,13 +25,13 @@ const BalancePage: React.FC = () => {
           <p className="section-label mb-3">To'lov usullari</p>
           <div className="space-y-2.5">
             <MethodRow
-              icon={<CreditCard size={20} className="text-indigo-300" />}
+              icon={<CardsIcon size={32} />}
               title="UZCARD / HUMO"
               desc="Karta orqali balans to'ldirish"
               onClick={() => navigate('/topup/uzcard')}
             />
             <MethodRow
-              icon={<Landmark size={20} className="text-emerald-400" />}
+              icon={<AtmIcon size={32} />}
               title="BANKOMAT"
               desc="Naqd pul orqali balans to'ldirish"
               onClick={() => navigate('/topup/bankomat')}
