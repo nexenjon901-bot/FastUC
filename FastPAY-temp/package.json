@@ -1,0 +1,20 @@
+{
+  "name": "fastpay-monorepo",
+  "version": "1.0.0",
+  "description": "1. Ushbu papkada `.env` faylini yarating va unga `.env.example` dagi ma'lumotlarni ko'chiring. 2. Ma'lumotlar bazasi (PostgreSQL) va Redis ni ishga tushirish uchun:    ```bash    docker-compose up -d    ``` 3. Backend (NestJS) uchun:    ```bash    cd backend    npm install    npx prisma db push    npm run start:dev    ``` 4. Frontend (React) uchun:    ```bash    cd frontend    npm install    npm run dev    ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "prisma": "^7.8.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.8.0",
+    "dotenv": "^17.4.2"
+  }
+}
