@@ -1,152 +1,132 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import api from '../api';
 
-const C = {
-  bg: '#181927', card: '#252642', card2: '#1e1f3a',
-  border: '#3C4172', accent: '#737DE4', text: '#F5F5F8', muted: '#858BB8',
-};
-
 const ProfilePage: React.FC = () => {
-  const [balance, setBalance] = useState<number>(0);
-  const [user, setUser] = useState<any>(null);
+  const [balance, setBalance] = useState(0);
+  const [user, setUser] = useState<{ firstName?: string; username?: string; telegramId?: string; createdAt?: string; } | null>(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get('/users/me');
-        setBalance(Number(res.data.balance) || 0);
-        setUser(res.data);
-      } catch (e) {}
-    };
-    fetchUser();
-    const interval = setInterval(fetchUser, 5000);
-    return () => clearInterval(interval);
+    api.get('/users/me')
+      .then(r => {
+        setBalance(r.data?.balance || 0);
+        setUser(r.data);
+      })
+      .catch(() => {});
   }, []);
 
-  const triggerHaptic = () => {
-    if (window.Telegram?.WebApp?.HapticFeedback) {
-      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-    }
-  };
-
-  const openLink = (url: string) => {
-    triggerHaptic();
-    if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
-    else window.location.href = url;
-  };
+  const displayName = user?.firstName || user?.username || 'Foydalanuvchi';
+  const initials = displayName.charAt(0).toUpperCase();
+  const joinDate = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.')
+    : new Date().toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.');
 
   const menuItems = [
     {
-      label: 'Yangiliklar kanali',
-      sub: "So'nggi yangiliklar",
-      action: () => openLink('https://t.me/FastUC_news'),
-      iconColor: C.accent,
       icon: (
         <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-          <path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 8h2a2 2 0 100-4h-2M2 9.424A11.966 11.966 0 0012 17.5a11.966 11.966 0 0010-8.076M2 9.424A11.966 11.966 0 0112 1.348a11.966 11.966 0 0110 8.076M2 9.424h20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       ),
+      label: 'Yangiliklar kanali',
+      action: () => window.open('https://t.me/fastpay_news', '_blank'),
     },
     {
-      label: "Qo'llab-quvvatlash",
-      sub: "24/7 yordam",
-      action: () => openLink('https://t.me/FastUC_support'),
-      iconColor: '#22c55e',
       icon: (
         <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
           <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
         </svg>
       ),
+      label: "Qo'llab-Quvvatlash",
+      action: () => window.open('https://t.me/fastpay_support', '_blank'),
     },
     {
-      label: 'Ommaviy oferta',
-      sub: "Shartlar va qoidalar",
-      action: () => { triggerHaptic(); alert("Tez kunda!"); },
-      iconColor: C.muted,
       icon: (
         <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-          <path d="M9 12h6M9 16h6M19 8.5V20a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2h6.5L19 8.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <line x1="9" y1="13" x2="15" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          <line x1="9" y1="17" x2="13" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
         </svg>
       ),
+      label: 'Ommaviy oferta',
+      action: () => {},
     },
   ];
 
   return (
-    <div className="page-container" style={{ background: C.bg }}>
+    <div className="page-container" style={{ paddingBottom: 0 }}>
       <Header balance={balance} />
 
-      <div style={{ padding: '24px 16px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div className="px-4 py-8 pb-24 flex flex-col items-center">
         {/* Avatar */}
-        <div style={{ position: 'relative', marginBottom: 12 }}>
-          <div style={{
-            width: 88, height: 88, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #737DE4, #5a63c8)',
-            boxShadow: '0 0 28px rgba(115,125,228,0.4)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontSize: '2rem', fontWeight: 900,
-          }}>
-            {user?.firstName?.charAt(0) || 'F'}
+        <div className="relative mb-4">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-white text-3xl font-black shadow-[0_0_30px_rgba(168,85,247,0.4)]">
+            {initials}
           </div>
-          <div style={{ position: 'absolute', bottom: 4, right: 4, width: 18, height: 18, background: '#22c55e', border: `3px solid ${C.bg}`, borderRadius: '50%' }}/>
+          <div className="absolute bottom-1 right-1 w-5 h-5 bg-[#10b981] border-4 border-[#12132b] rounded-full" />
         </div>
 
-        <h1 style={{ color: C.text, fontWeight: 900, fontSize: '1.3rem', marginBottom: 6 }}>
-          {user?.firstName || 'Foydalanuvchi'}
-        </h1>
-        <div style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 9999, padding: '5px 16px', marginBottom: 28 }}>
-          <span style={{ color: C.muted, fontSize: '0.78rem', fontWeight: 600 }}>
-            ID: <span style={{ color: C.text }}>{user?.telegramId || '...'}</span>
-          </span>
+        {/* Name */}
+        <h1 className="text-2xl font-black text-white mb-2">{displayName}</h1>
+
+        {/* ID badge */}
+        <div className="flex items-center gap-2 px-4 py-1.5 bg-[#1e2040] rounded-full border border-[#6366f1]/20 mb-8">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" className="text-[#8b92b8]">
+            <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
+            <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
+          </svg>
+          <span className="text-[#8b92b8] font-800 text-sm">ID: {user?.telegramId || '—'}</span>
         </div>
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, width: '100%', marginBottom: 24 }}>
-          <div style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 22, padding: '18px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(115,125,228,0.08) 0%, transparent 70%)' }}/>
-            <div style={{ width: 44, height: 44, background: C.card2, border: `1px solid ${C.border}`, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, zIndex: 1, color: C.accent }}>
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+        <div className="grid grid-cols-2 gap-4 w-full mb-8">
+          <div className="card-inner p-5 flex flex-col items-center text-center">
+            <div className="w-12 h-12 rounded-2xl bg-[#12132b] flex items-center justify-center mb-3 text-[#818cf8]">
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
-            <p style={{ color: C.muted, fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', textAlign: 'center', marginBottom: 6, zIndex: 1 }}>BAJARILGAN<br/>BUYURTMALAR</p>
-            <h2 style={{ color: C.text, fontSize: '1.6rem', fontWeight: 900, zIndex: 1 }}>0</h2>
+            <p className="text-[#8b92b8] text-[10px] font-800 uppercase tracking-wider leading-tight mb-2">
+              Bajarilgan<br/>Buyurtmalar
+            </p>
+            <p className="text-white font-black text-2xl">0</p>
           </div>
-          <div style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 22, padding: '18px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(115,125,228,0.05) 0%, transparent 70%)' }}/>
-            <div style={{ width: 44, height: 44, background: C.card2, border: `1px solid ${C.border}`, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, zIndex: 1, color: C.accent }}>
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+
+          <div className="card-inner p-5 flex flex-col items-center text-center">
+            <div className="w-12 h-12 rounded-2xl bg-[#12132b] flex items-center justify-center mb-3 text-[#818cf8]">
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
             </div>
-            <p style={{ color: C.muted, fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', textAlign: 'center', marginBottom: 6, zIndex: 1 }}>RO'YXATDAN<br/>O'TGAN</p>
-            <h2 style={{ color: C.text, fontSize: '0.82rem', fontWeight: 900, zIndex: 1 }}>
-              {user ? new Date(user.createdAt).toLocaleDateString('uz-UZ') : '...'}
-            </h2>
+            <p className="text-[#8b92b8] text-[10px] font-800 uppercase tracking-wider leading-tight mb-2">
+              Ro'yxatdan<br/>O'tgan
+            </p>
+            <p className="text-white font-black text-lg">{joinDate}</p>
           </div>
         </div>
 
         {/* Menu */}
-        <div style={{ width: '100%', background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 22, overflow: 'hidden' }}>
-          {menuItems.map((item, idx) => (
-            <div
-              key={idx}
+        <div className="w-full card overflow-hidden">
+          {menuItems.map((item, i) => (
+            <button
+              key={i}
               onClick={item.action}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '16px 18px', cursor: 'pointer',
-                borderBottom: idx < menuItems.length - 1 ? `1px solid ${C.border}` : 'none',
-                transition: 'background 0.15s',
-              }}
+              className={`w-full flex items-center justify-between p-4 hover:bg-white/4 active:bg-white/8 transition-colors ${
+                i < menuItems.length - 1 ? 'border-b border-white/6' : ''
+              }`}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: `${item.iconColor}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.iconColor }}>
-                  {item.icon}
-                </div>
-                <div>
-                  <p style={{ color: C.text, fontWeight: 700, fontSize: '0.88rem', marginBottom: 1 }}>{item.label}</p>
-                  <p style={{ color: C.muted, fontSize: '0.7rem' }}>{item.sub}</p>
-                </div>
+              <div className="flex items-center gap-4">
+                <span className="text-[#8b92b8]">{item.icon}</span>
+                <span className="text-white font-800 text-base">{item.label}</span>
               </div>
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke={C.muted} strokeWidth="2" strokeLinecap="round"/></svg>
-            </div>
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" className="text-white/25">
+                <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           ))}
         </div>
       </div>
