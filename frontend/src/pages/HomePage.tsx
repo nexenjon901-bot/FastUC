@@ -4,6 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import Header from '../components/Header';
 import { useApp } from '../context/AppContext';
 import { StarIcon, UcIcon } from '../components/icons';
+import { Gamepad2 } from 'lucide-react';
 
 const C = {
   bg: '#181927',
@@ -56,7 +57,7 @@ const HomePage: React.FC = () => {
           />
         </button>
 
-        {/* UC + Stars */}
+        {/* UC + Stars + Accounts */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 14 }}>
           <ServiceCard
             onClick={() => navigate('/catalog/uc')}
@@ -69,6 +70,22 @@ const HomePage: React.FC = () => {
             icon={<StarIcon size={68} />}
             title="TELEGRAM STARS"
             desc="Telegram Stars tez yetkazamiz"
+          />
+          <ServiceCard
+            onClick={() => navigate('/catalog/accounts')}
+            icon={
+              <div style={{
+                width: 72, height: 72,
+                borderRadius: 20,
+                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 8px 24px rgba(99,102,241,0.4)',
+              }}>
+                <Gamepad2 size={36} color="#fff" />
+              </div>
+            }
+            title="AKKAUNTLAR"
+            desc="Tayyor PUBG akkauntlar"
           />
         </div>
       </div>
