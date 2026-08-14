@@ -38,10 +38,7 @@ const categories = [
     color: '#737DE4',
     bg: 'rgba(115,125,228,0.08)',
     icon: (
-      <svg width="38" height="38" fill="none" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" stroke="#737DE4" strokeWidth="2"/>
-        <text x="12" y="16.5" textAnchor="middle" fill="#737DE4" fontSize="8" fontWeight="800" fontFamily="Outfit,sans-serif">UC</text>
-      </svg>
+      <img src="/uc.jpg" alt="UC" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px' }} />
     ),
   },
   {
@@ -52,10 +49,7 @@ const categories = [
     color: '#facc15',
     bg: 'rgba(250,204,21,0.08)',
     icon: (
-      <svg width="38" height="38" fill="none" viewBox="0 0 24 24">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-          stroke="#facc15" strokeWidth="2" fill="#facc15" fillOpacity="0.3" strokeLinejoin="round"/>
-      </svg>
+      <img src="/stars.jpg" alt="Stars" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px' }} />
     ),
   },
 ];
