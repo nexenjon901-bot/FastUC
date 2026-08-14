@@ -7,7 +7,7 @@ interface IconProps {
 
 export const UcIcon: React.FC<IconProps> = ({ size = 48, className }) => (
   <img
-    src="/icon-uc-transparent.png"
+    src="/icon-uc.png"
     alt="PUBG UC"
     className={className}
     width={size}
@@ -17,6 +17,7 @@ export const UcIcon: React.FC<IconProps> = ({ size = 48, className }) => (
       height: size,
       objectFit: 'contain',
       display: 'block',
+      mixBlendMode: 'screen',
       filter: 'drop-shadow(0 4px 18px rgba(212,170,0,0.55))',
     }}
     draggable={false}
@@ -25,7 +26,7 @@ export const UcIcon: React.FC<IconProps> = ({ size = 48, className }) => (
 
 export const StarIcon: React.FC<IconProps> = ({ size = 48, className }) => (
   <img
-    src="/icon-stars-transparent.png"
+    src="/icon-stars.png"
     alt="Telegram Stars"
     className={className}
     width={size}
@@ -35,6 +36,7 @@ export const StarIcon: React.FC<IconProps> = ({ size = 48, className }) => (
       height: size,
       objectFit: 'contain',
       display: 'block',
+      mixBlendMode: 'screen',
       filter: 'drop-shadow(0 4px 18px rgba(250,200,0,0.55))',
     }}
     draggable={false}

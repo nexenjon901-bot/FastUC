@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, CreditCard, MessageCircle } from 'lucide-react';
+import { ChevronLeft, MessageCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { links } from '../api/services';
 
@@ -64,27 +64,6 @@ const Header: React.FC<HeaderProps> = ({
         >
           F
         </div>
-
-        <button
-          onClick={() => navigate('/balance')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            height: 42,
-            padding: '0 14px',
-            borderRadius: 12,
-            border: '1.5px solid #3C4172',
-            background: '#252642',
-            color: '#F5F5F8',
-            fontWeight: 700,
-            fontSize: 14,
-            cursor: 'pointer',
-          }}
-        >
-          <CreditCard size={16} color="#737DE4" />
-          {balanceText} UZS
-        </button>
 
         <button
           onClick={() => window.open(links.feedback, '_blank')}
