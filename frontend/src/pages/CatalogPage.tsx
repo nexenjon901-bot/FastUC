@@ -4,10 +4,9 @@ import { ShoppingCart } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import SegmentedNav from '../components/SegmentedNav';
 import ProductCard from '../components/ProductCard';
-import AccountCard from '../components/AccountCard';
 import VerifiedCard from '../components/VerifiedCard';
 import { apiService, formatUzs } from '../api/services';
-import type { GameAccount, Product, VerifiedPlayer, VerifiedTelegram } from '../types';
+import type { Product, VerifiedPlayer, VerifiedTelegram } from '../types';
 
 const CatalogPage: React.FC = () => {
   const { type = 'uc' } = useParams<{ type: string }>();
@@ -17,7 +16,6 @@ const CatalogPage: React.FC = () => {
   const isAccounts = type === 'accounts';
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [accounts, setAccounts] = useState<GameAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Product | null>(null);
   const [target, setTarget] = useState('');
@@ -35,7 +33,7 @@ const CatalogPage: React.FC = () => {
     setLoading(true);
 
     if (isAccounts) {
-      apiService.getAccounts().then(setAccounts).finally(() => setLoading(false));
+      setLoading(false);
       return;
     }
 
@@ -103,19 +101,13 @@ const CatalogPage: React.FC = () => {
               <h2 className="section-title text-lg">{title}</h2>
               <p className="text-sm text-[#8b92b8] font-semibold mt-1">{subtitle}</p>
             </div>
-            {loading ? (
-              <div className="grid gap-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="shimmer h-44 rounded-2xl" />
-                ))}
-              </div>
-            ) : (
-              <div className="grid gap-3">
-                {accounts.map((acc) => (
-                  <AccountCard key={acc.id} account={acc} onClick={() => navigate(`/accounts/${acc.id}`)} />
-                ))}
-              </div>
-            )}
+            
+            <div className="card" style={{ padding: 32, textAlign: 'center', marginTop: 20 }}>
+              <p style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Tez kunda!</p>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                Akkauntlar bo'limi ustida ish olib bormoqdamiz.
+              </p>
+            </div>
           </>
         ) : (
           <>

@@ -72,7 +72,7 @@ const OrdersPage: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {filtered.map((order) => (
               <OrderCard key={order.id} order={order} onClick={() => navigate(`/orders/${order.id}`)} />
             ))}

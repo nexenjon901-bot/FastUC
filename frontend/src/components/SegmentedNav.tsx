@@ -2,9 +2,8 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const items = [
-  { key: 'accounts', label: 'Akkauntlar', path: '/catalog/accounts' },
   { key: 'uc', label: 'PUBG UC', path: '/catalog/uc' },
-  { key: 'stars', label: 'Stars', path: '/catalog/stars' },
+  { key: 'stars', label: 'Telegram Stars', path: '/catalog/stars' },
 ] as const;
 
 const SegmentedNav: React.FC = () => {
@@ -12,7 +11,7 @@ const SegmentedNav: React.FC = () => {
   const { pathname } = useLocation();
 
   return (
-    <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-[#242746] border border-white/6">
+    <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-[#242746] border border-white/6">
       {items.map((item) => {
         const active = pathname.includes(item.key);
         return (

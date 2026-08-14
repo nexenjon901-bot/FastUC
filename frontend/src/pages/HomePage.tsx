@@ -27,6 +27,34 @@ const HomePage: React.FC = () => {
       <Header variant="home" showFeedback={false} />
 
       <div style={{ padding: '8px 16px 16px' }}>
+        {/* AKKAUNTLAR banner */}
+        <button
+          onClick={() => navigate('/catalog/accounts')}
+          style={{
+            width: '100%',
+            border: `1.5px solid ${C.border}`,
+            padding: 0,
+            cursor: 'pointer',
+            borderRadius: 20,
+            overflow: 'hidden',
+            background: '#0d1020',
+            display: 'block',
+            lineHeight: 0,
+          }}
+        >
+          <img
+            src="/accounts-banner.png"
+            alt="PUBG Akkauntlar"
+            style={{
+              width: '100%',
+              height: 'auto',
+              aspectRatio: '16 / 9',
+              objectFit: 'cover',
+              objectPosition: 'left center',
+              display: 'block',
+            }}
+          />
+        </button>
 
         {/* UC + Stars */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 14 }}>
