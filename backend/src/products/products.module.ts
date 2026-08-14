@@ -1,16 +1,11 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import {
-  ProductsController,
-  ProductOrdersController,
-  AdminProductsController,
-} from './products.controller';
+import { ProductsController } from './products.controller';
 import { PrismaModule } from '../prisma/prisma.module';
-import { BotModule } from '../bot/bot.module';
 
 @Module({
-  imports: [PrismaModule, forwardRef(() => BotModule)],
-  controllers: [ProductsController, ProductOrdersController, AdminProductsController],
+  imports: [PrismaModule],
+  controllers: [ProductsController],
   providers: [ProductsService],
   exports: [ProductsService],
 })

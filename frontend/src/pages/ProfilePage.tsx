@@ -1,156 +1,129 @@
-import React, { useEffect, useState } from 'react';
-import Header from '../components/Header';
-import { useAuth } from '../context/AuthContext';
-import api from '../api';
+import React, { useMemo } from 'react';
+import { ChevronRight, FileText, Headphones, Megaphone, Shield } from 'lucide-react';
+import PageShell from '../components/PageShell';
+import { useApp } from '../context/AppContext';
+import { links } from '../api/services';
 
 const ProfilePage: React.FC = () => {
-  const { user, photoUrl } = useAuth();
-  const [balance, setBalance] = useState(0);
-  const [completedOrders, setCompletedOrders] = useState(0);
-
-  useEffect(() => {
-    if (user?.balance) {
-      setBalance(Number(user.balance));
-    }
-    
-    // Fetch orders to get completed count
-    api.get('/orders').then(res => {
-      const orders = res.data || [];
-      const completed = orders.filter((o: any) => o.status === 'COMPLETED' || o.status === 'DELIVERED').length;
-      setCompletedOrders(completed);
-    }).catch(() => {
-      // Ignore if fails
-    });
-  }, [user]);
-
-  const displayName = user?.firstName || user?.username || 'Foydalanuvchi';
-  const tgId = user?.telegramId || user?.id || '—';
-  const usernameText = user?.username ? `@${user.username}` : 'Mavjud emas';
-  
-  const initials = displayName.charAt(0).toUpperCase();
+  const { user, orders } = useApp();
+  const initials = (user?.firstName || user?.username || 'F').charAt(0).toUpperCase();
   const joinDate = user?.createdAt
-    ? new Date(user.createdAt).toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.')
-    : new Date().toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.');
+    ? new Date(user.createdAt).toLocaleDateString('uz-UZ', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+    : '—';
 
-  const menuItems = [
-    {
-      icon: (
-        <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-          <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      ),
-      label: 'Yangiliklar kanali',
-      action: () => window.open('https://t.me/fastpay_news', '_blank'),
-    },
-    {
-      icon: (
-        <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-          <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-        </svg>
-      ),
-      label: "Qo'llab-Quvvatlash",
-      action: () => window.open('https://t.me/fastpay_support', '_blank'),
-    },
-    {
-      icon: (
-        <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <line x1="9" y1="13" x2="15" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          <line x1="9" y1="17" x2="13" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-        </svg>
-      ),
-      label: 'Ommaviy oferta',
-      action: () => {},
-    },
+  const completed = useMemo(
+    () => orders.filter((o) => o.status === 'COMPLETED').length || user?.completedOrders || 0,
+    [orders, user?.completedOrders]
+  );
+
+  const menu = [
+    { icon: Megaphone, label: 'Yangiliklar kanali', href: links.news },
+    { icon: Headphones, label: "Qo'llab-quvvatlash", href: links.support },
+    { icon: FileText, label: 'Foydalanish shartlari', href: links.terms },
+    { icon: Shield, label: 'Maxfiylik siyosati', href: links.privacy },
   ];
 
   return (
-    <div className="page-container" style={{ paddingBottom: 0 }}>
-      <Header balance={balance} userName={user?.firstName || 'U'} photoUrl={photoUrl} />
-
-      <div className="px-4 py-8 pb-24 flex flex-col items-center">
-        {/* Avatar */}
-        <div className="relative mb-4">
-          {photoUrl ? (
-            <img 
-              src={photoUrl} 
-              alt="avatar" 
-              className="w-24 h-24 rounded-full object-cover border-4 border-[#12132b] shadow-[0_0_30px_rgba(168,85,247,0.4)]"
-            />
-          ) : (
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-white text-3xl font-black shadow-[0_0_30px_rgba(168,85,247,0.4)]">
-              {initials}
-            </div>
-          )}
-          <div className="absolute bottom-1 right-1 w-5 h-5 bg-[#10b981] border-4 border-[#12132b] rounded-full" />
-        </div>
-
-        {/* Name */}
-        <h1 className="text-2xl font-black text-white mb-1">{displayName}</h1>
-        <p className="text-[#8b92b8] text-sm mb-4 font-medium">{usernameText}</p>
-
-        {/* ID badge */}
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-[#1e2040] rounded-full border border-[#6366f1]/20 mb-8">
-          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" className="text-[#8b92b8]">
-            <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
-            <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
-          </svg>
-          <span className="text-[#8b92b8] font-800 text-sm">ID: {tgId}</span>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 w-full mb-8">
-          <div className="card-inner p-5 flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-[#12132b] flex items-center justify-center mb-3 text-[#818cf8]">
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <p className="text-[#8b92b8] text-[10px] font-800 uppercase tracking-wider leading-tight mb-2">
-              Bajarilgan<br/>Buyurtmalar
-            </p>
-            <p className="text-white font-black text-2xl">{completedOrders}</p>
-          </div>
-
-          <div className="card-inner p-5 flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-[#12132b] flex items-center justify-center mb-3 text-[#818cf8]">
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <p className="text-[#8b92b8] text-[10px] font-800 uppercase tracking-wider leading-tight mb-2">
-              Ro'yxatdan<br/>O'tgan
-            </p>
-            <p className="text-white font-black text-lg">{joinDate}</p>
-          </div>
-        </div>
-
-        {/* Menu */}
-        <div className="w-full card overflow-hidden">
-          {menuItems.map((item, i) => (
-            <button
-              key={i}
-              onClick={item.action}
-              className={`w-full flex items-center justify-between p-4 hover:bg-white/4 active:bg-white/8 transition-colors ${
-                i < menuItems.length - 1 ? 'border-b border-white/6' : ''
-              }`}
+    <PageShell title="Profil" showBack>
+      <div className="animate-fadeup">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 22 }}>
+          <div style={{ position: 'relative', marginBottom: 12 }}>
+            <div
+              style={{
+                width: 92,
+                height: 92,
+                borderRadius: '50%',
+                border: '3px solid rgba(111,120,240,0.45)',
+                background: 'var(--primary-soft)',
+                display: 'grid',
+                placeItems: 'center',
+                overflow: 'hidden',
+                fontSize: 34,
+                fontWeight: 800,
+              }}
             >
-              <div className="flex items-center gap-4">
-                <span className="text-[#8b92b8]">{item.icon}</span>
-                <span className="text-white font-800 text-base">{item.label}</span>
+              {user?.photoUrl ? (
+                <img src={user.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                initials
+              )}
+            </div>
+            <span
+              style={{
+                position: 'absolute',
+                right: 4,
+                bottom: 6,
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                background: 'var(--success)',
+                border: '3px solid var(--bg)',
+              }}
+            />
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 800 }}>
+            {user?.firstName || (user?.username ? `@${user.username}` : 'Foydalanuvchi')}
+          </h2>
+          <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4, fontWeight: 600 }}>
+            ID: {user?.telegramId || '—'}
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
+          <div className="card" style={{ padding: 16, textAlign: 'center' }}>
+            <p style={{ fontSize: 24, fontWeight: 800, color: 'var(--primary-light)' }}>{completed}</p>
+            <p style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 700, marginTop: 4 }}>
+              Bajarilgan buyurtmalar
+            </p>
+          </div>
+          <div className="card" style={{ padding: 16, textAlign: 'center' }}>
+            <p style={{ fontSize: 16, fontWeight: 800 }}>{joinDate}</p>
+            <p style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 700, marginTop: 4 }}>
+              Ro'yxatdan o'tgan
+            </p>
+          </div>
+        </div>
+
+        <div className="card" style={{ overflow: 'hidden' }}>
+          {menu.map(({ icon: Icon, label, href }, i) => (
+            <a
+              key={label}
+              href={href}
+              target={href.startsWith('http') ? '_blank' : undefined}
+              rel="noreferrer"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '14px 16px',
+                borderBottom: i < menu.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 11,
+                    background: 'var(--primary-soft)',
+                    display: 'grid',
+                    placeItems: 'center',
+                  }}
+                >
+                  <Icon size={17} color="var(--primary-light)" />
+                </div>
+                <span style={{ fontSize: 14, fontWeight: 700 }}>{label}</span>
               </div>
-              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" className="text-white/25">
-                <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
+              <ChevronRight size={17} color="var(--text-muted)" />
+            </a>
           ))}
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 };
 

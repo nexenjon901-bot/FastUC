@@ -6,12 +6,9 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { OrdersModule } from './orders/orders.module';
-import { AccountsModule } from './accounts/accounts.module';
-import { TopupModule } from './topup/topup.module';
-import { AdminModule } from './admin/admin.module';
-import { BotModule } from './bot/bot.module';
 import { ProductsModule } from './products/products.module';
+import { OrdersModule } from './orders/orders.module';
+import { TopupsModule } from './topups/topups.module';
 
 @Module({
   imports: [
@@ -26,12 +23,9 @@ import { ProductsModule } from './products/products.module';
     PrismaModule,
     UsersModule,
     AuthModule,
-    OrdersModule,
-    AccountsModule,
-    TopupModule,
-    AdminModule,
-    BotModule,
     ProductsModule,
+    OrdersModule,
+    TopupsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

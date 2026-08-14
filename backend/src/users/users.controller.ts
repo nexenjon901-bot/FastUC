@@ -13,13 +13,12 @@ export class UsersController {
     if (!user) return null;
     return {
       id: user.id,
-      telegramId: user.telegramId,
+      telegramId: user.telegramId.toString(),
       username: user.username,
       firstName: user.firstName,
+      avatarUrl: user.avatarUrl,
       balance: user.balance,
-      languageCode: user.languageCode,
       createdAt: user.createdAt,
-      lastLoginAt: user.lastLoginAt,
     };
   }
 }

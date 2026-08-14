@@ -56,11 +56,7 @@ export class AuthService {
     const telegramUser = JSON.parse(userStr);
     const user = await this.usersService.upsertTelegramUser(telegramUser);
 
-    if (user.isBlocked) {
-      throw new UnauthorizedException('User is blocked');
-    }
-
-    const payload = { sub: user.id, telegramId: user.telegramId, role: 'USER', typ: 'user' };
+    const payload = { sub: user.id, telegramId: user.telegramId.toString(), role: 'USER', typ: 'user' };
     return {
       access_token: this.jwtService.sign(payload),
       user,
@@ -81,7 +77,7 @@ export class AuthService {
       language_code: 'uz',
     });
 
-    const payload = { sub: user.id, telegramId: user.telegramId, role: 'USER', typ: 'user' };
+    const payload = { sub: user.id, telegramId: user.telegramId.toString(), role: 'USER', typ: 'user' };
     return {
       access_token: this.jwtService.sign(payload),
       user,

@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
   engineType = "library"
@@ -10,238 +11,75 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  telegramId    String    @unique
+  id            String    @id @default(cuid())
+  telegramId    BigInt    @unique
   username      String?
   firstName     String?
-  balance       Decimal   @default(0) @db.Decimal(10, 2)
+  avatarUrl     String?
+  balance       Int       @default(0) // UZS, faqat backend o'zgartiradi
   createdAt     DateTime  @default(now())
-  isBlocked     Boolean   @default(false)
-  lastLoginAt   DateTime?
-  languageCode  String    @default("uz")
-  
   orders        Order[]
-  transactions  Transaction[]
-  topUpRequests TopUpRequest[]
-  productOrders ProductOrder[]
+  topups        Topup[]
 }
 
-model Account {
-  id               String       @id @default(uuid())
-  sku              String       @unique // e.g. "PG-4471"
-  title            String
-  rank             String
-  level            Int
-  skinsCount       Int
-  ucBalance        Int
-  price            Decimal      @db.Decimal(10, 2)
-  status           AccountStatus @default(AVAILABLE)
-  description      String?      @db.Text
-  images           String[]     // S3 urls
-  linkedAccounts   String[]     // e.g. ["Google", "Twitter"]
-  createdByAdminId String
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+model Product {
+  id            String    @id @default(cuid())
+  category      String    // "UC" | "STARS" | "SUBSCRIPTION" | "PREMIUM"
+  label         String    // "60 UC", "75 Stars"
+  amount        Int       // 60, 75 — real miqdor
+  priceUzs      Int
+  isFeatured    Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  sortOrder     Int       @default(0)
 
-  credential       AccountCredential?
-  orders           Order[]
-}
-
-enum AccountStatus {
-  AVAILABLE
-  RESERVED
-  SOLD
-  HIDDEN
-}
-
-model AccountCredential {
-  id                   String    @id @default(uuid())
-  accountId            String    @unique
-  account              Account   @relation(fields: [accountId], references: [id])
-  encryptedLogin       String
-  encryptedPassword    String
-  encryptionKeyVersion String
-  revealedAt           DateTime?
-  revealedToOrderId    String?
+  orders        Order[]
 }
 
 model Order {
-  id            String       @id @default(uuid())
-  orderNumber   String       @unique
-  buyerId       String
-  buyer         User         @relation(fields: [buyerId], references: [id])
-  accountId     String
-  account       Account      @relation(fields: [accountId], references: [id])
-  amount        Decimal      @db.Decimal(10, 2)
-  status        OrderStatus  @default(PENDING_PAYMENT)
-  escrowStep    Int          @default(0) // 0-3
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  confirmedAt   DateTime?
-
-  disputes      Dispute[]
-  transactions  Transaction[]
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id])
+  targetId      String    // PUBG ID yoki @username
+  status        OrderStatus @default(PENDING)
+  priceUzs      Int       // xarid vaqtidagi narx (snapshot, Product narxi keyin o'zgarsa ham)
+  createdAt     DateTime  @default(now())
+  fulfilledAt   DateTime?
+  fulfilledBy   String?   // admin telegram id
+  cancelReason  String?
 }
 
 enum OrderStatus {
-  PENDING_PAYMENT
-  ESCROW_HELD
-  ADMIN_REVIEW
-  CREDENTIALS_SENT
-  BUYER_CONFIRMED
-  COMPLETED
-  DISPUTED
-  CANCELLED
-  REFUNDED
-}
-
-model Transaction {
-  id                    String            @id @default(uuid())
-  userId                String
-  user                  User              @relation(fields: [userId], references: [id])
-  type                  TransactionType
-  amount                Decimal           @db.Decimal(10, 2)
-  balanceAfter          Decimal           @db.Decimal(10, 2)
-  orderId               String?
-  order                 Order?            @relation(fields: [orderId], references: [id])
-  paymentProvider       PaymentProvider?
-  providerTransactionId String?           @unique
-  status                TransactionStatus @default(COMPLETED)
-  createdAt             DateTime          @default(now())
-}
-
-enum TransactionType {
-  TOPUP
-  ESCROW_HOLD
-  ESCROW_RELEASE
-  REFUND
-  ADMIN_ADJUST
-  PRODUCT_PURCHASE
-}
-
-enum PaymentProvider {
-  MANUAL
-  CLICK
-  PAYME
-  UZCARD_HUMO
-}
-
-enum TransactionStatus {
   PENDING
-  COMPLETED
-  FAILED
+  CONFIRMED
+  FULFILLED
+  CANCELLED
 }
 
-model AdminUser {
-  id                  String     @id @default(uuid())
-  email               String     @unique
-  passwordHash        String
-  totpSecret          String?
-  role                AdminRole  @default(MODERATOR)
-  isActive            Boolean    @default(true)
-  lastLoginAt         DateTime?
-  failedLoginAttempts Int        @default(0)
-  lockedUntil         DateTime?
+model Topup {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  amountUzs     Int
+  method        String    // "UZCARD_HUMO" | "BANKOMAT"
+  status        TopupStatus @default(PENDING)
+  createdAt     DateTime  @default(now())
+  approvedAt    DateTime?
+  approvedBy    String?   // admin telegram id
+  rejectReason  String?
 }
 
-enum AdminRole {
-  SUPERADMIN
-  MODERATOR
-}
-
-model AuditLog {
-  id          String   @id @default(uuid())
-  actorType   String   // ADMIN, SYSTEM, USER
-  actorId     String
-  action      String
-  targetType  String?
-  targetId    String?
-  metadata    Json?
-  ipAddress   String?
-  userAgent   String?
-  createdAt   DateTime @default(now())
-}
-
-model Dispute {
-  id               String        @id @default(uuid())
-  orderId          String
-  order            Order         @relation(fields: [orderId], references: [id])
-  openedBy         String
-  reason           String        @db.Text
-  status           DisputeStatus @default(OPEN)
-  resolutionNote   String?       @db.Text
-  resolvedByAdminId String?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-}
-
-enum DisputeStatus {
-  OPEN
-  RESOLVED
-  REJECTED
-}
-
-model TopUpRequest {
-  id               String          @id @default(uuid())
-  userId           String
-  user             User            @relation(fields: [userId], references: [id])
-  amount           Decimal         @db.Decimal(10, 2)
-  method           PaymentProvider
-  proofImageUrl    String?
-  userComment      String?
-  status           TopUpStatus     @default(PENDING)
-  reviewedByAdminId String?
-  reviewedAt       DateTime?
-  rejectionReason  String?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-}
-
-enum TopUpStatus {
+enum TopupStatus {
   PENDING
   APPROVED
   REJECTED
 }
 
-model Product {
-  id            String          @id @default(uuid())
-  category      ProductCategory
-  name          String
-  amount        Int
-  price         Decimal         @db.Decimal(10, 2)
-  imageUrl      String?
-  isActive      Boolean         @default(true)
-  sortOrder     Int             @default(0)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-
-  productOrders ProductOrder[]
-}
-
-enum ProductCategory {
-  UC
-  STARS
-}
-
-model ProductOrder {
-  id                 String             @id @default(uuid())
-  orderNumber        String             @unique
-  userId             String
-  user               User               @relation(fields: [userId], references: [id])
-  productId          String
-  product            Product            @relation(fields: [productId], references: [id])
-  quantity           Int                @default(1)
-  amount             Decimal            @db.Decimal(10, 2)
-  status             ProductOrderStatus @default(PENDING)
-  playerIdOrUsername String?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  deliveredAt        DateTime?
-}
-
-enum ProductOrderStatus {
-  PENDING
-  PROCESSING
-  COMPLETED
-  CANCELLED
+model AdminAction {
+  id            String    @id @default(cuid())
+  adminId       String
+  action        String    // "APPROVE_TOPUP" | "REJECT_TOPUP" | "FULFILL_ORDER"
+  targetId      String
+  createdAt     DateTime  @default(now())
 }

@@ -1,66 +1,94 @@
-import React, { useEffect, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React, { useEffect } from 'react';
+import { HashRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import WebApp from '@twa-dev/sdk';
 import { AuthProvider } from './context/AuthContext';
-import { initI18n } from './i18n';
-import './index.css';
-
+import { AppProvider } from './context/AppContext';
 import BottomNav from './components/BottomNav';
 import HomePage from './pages/HomePage';
-import AccountsPage from './pages/AccountsPage';
-import AccountDetailPage from './pages/AccountDetailPage';
-import BalancePage from './pages/BalancePage';
+import CatalogPage from './pages/CatalogPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
 import OrdersPage from './pages/OrdersPage';
-import EscrowPage from './pages/EscrowPage';
+import OrderDetailPage from './pages/OrderDetailPage';
+import BalancePage from './pages/BalancePage';
+import TopupPage from './pages/TopupPage';
+import TopupSuccessPage from './pages/TopupSuccessPage';
+import AccountDetailPage from './pages/AccountDetailPage';
 import ProfilePage from './pages/ProfilePage';
-import AdminPage from './pages/AdminPage';
-import ProductPurchasePage from './pages/ProductPurchasePage';
+import './index.css';
 
-const queryClient = new QueryClient();
+const BackButtonBridge: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    try {
+      const rootPaths = ['/', '/balance', '/orders', '/profile'];
+      if (rootPaths.includes(location.pathname)) {
+        WebApp.BackButton.hide();
+        return;
+      }
+      WebApp.BackButton.show();
+      const handler = () => navigate(-1);
+      WebApp.BackButton.onClick(handler);
+      return () => {
+        WebApp.BackButton.offClick(handler);
+        WebApp.BackButton.hide();
+      };
+    } catch {
+      return undefined;
+    }
+  }, [location.pathname, navigate]);
+
+  return null;
+};
+
+const AppLayout: React.FC = () => {
+  const location = useLocation();
+  const hideNav = location.pathname.startsWith('/topup/success') || location.pathname.startsWith('/order-success');
+
+  return (
+    <>
+      <BackButtonBridge />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/catalog/:type" element={<CatalogPage />} />
+        <Route path="/accounts/:id" element={<AccountDetailPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-success" element={<OrderSuccessPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/:id" element={<OrderDetailPage />} />
+        <Route path="/balance" element={<BalancePage />} />
+        <Route path="/topup/:method" element={<TopupPage />} />
+        <Route path="/topup/success" element={<TopupSuccessPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      {!hideNav && <BottomNav />}
+    </>
+  );
+};
 
 const App: React.FC = () => {
   useEffect(() => {
-    if (WebApp.ready) WebApp.ready();
-    if (WebApp.expand) WebApp.expand();
-
-    // Set language from Telegram
-    const lang = WebApp.initDataUnsafe?.user?.language_code || 'uz';
-    const supported = ['uz', 'ru', 'en'];
-    initI18n(supported.includes(lang) ? lang : 'uz');
+    try {
+      WebApp.ready();
+      WebApp.expand();
+    } catch {
+      /* dev */
+    }
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
-          <div className="relative min-h-screen bg-bg font-sans">
-            <Suspense fallback={
-              <div className="flex items-center justify-center min-h-screen">
-                <div className="w-8 h-8 rounded-full border-2 border-accent-indigo border-t-transparent animate-spin" />
-              </div>
-            }>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/accounts" element={<AccountsPage />} />
-                <Route path="/accounts/:id" element={<AccountDetailPage />} />
-                <Route path="/balance" element={<BalancePage />} />
-                <Route path="/orders" element={<OrdersPage />} />
-                <Route path="/orders/:id" element={<EscrowPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="/products/:id" element={<ProductPurchasePage />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Suspense>
-            <Routes>
-              <Route path="/admin" element={null} />
-              <Route path="*" element={<BottomNav />} />
-            </Routes>
+    <AuthProvider>
+      <AppProvider>
+        <HashRouter>
+          <div className="relative min-h-screen max-w-[480px] mx-auto bg-[#12132b]">
+            <AppLayout />
           </div>
-        </BrowserRouter>
-      </AuthProvider>
-    </QueryClientProvider>
+        </HashRouter>
+      </AppProvider>
+    </AuthProvider>
   );
 };
 

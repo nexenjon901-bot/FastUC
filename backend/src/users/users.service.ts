@@ -7,25 +7,23 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async upsertTelegramUser(telegramUser: any): Promise<User> {
-    const telegramId = telegramUser.id.toString();
+    const telegramId = BigInt(telegramUser.id);
     const username = telegramUser.username || null;
     const firstName = telegramUser.first_name || null;
-    const languageCode = telegramUser.language_code || 'uz';
+    const avatarUrl = telegramUser.photo_url || null;
 
     return this.prisma.user.upsert({
       where: { telegramId },
       update: {
         username,
         firstName,
-        lastLoginAt: new Date(),
-        // Keep existing language if already set, or you could overwrite based on preference
+        avatarUrl,
       },
       create: {
         telegramId,
         username,
         firstName,
-        languageCode,
-        lastLoginAt: new Date(),
+        avatarUrl,
       },
     });
   }

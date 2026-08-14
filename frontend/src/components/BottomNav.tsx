@@ -1,59 +1,66 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Wallet, History, User } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Home, Wallet, ClipboardList, UserRound } from 'lucide-react';
+
+const tabs = [
+  { to: '/', icon: Home, label: 'Asosiy' },
+  { to: '/balance', icon: Wallet, label: 'Balans' },
+  { to: '/orders', icon: ClipboardList, label: 'Buyurtmalar' },
+  { to: '/profile', icon: UserRound, label: 'Profil' },
+];
 
 const BottomNav: React.FC = () => {
-  const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const tabs = [
-    {
-      path: '/',
-      label: 'Asosiy',
-      icon: Home,
-    },
-    {
-      path: '/balance',
-      label: 'Balans',
-      icon: Wallet,
-    },
-    {
-      path: '/orders',
-      label: 'Tarix',
-      icon: History,
-    },
-    {
-      path: '/profile',
-      label: 'Profil',
-      icon: User,
-    },
-  ];
-
   return (
-    <nav className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-[#12132b]/95 backdrop-blur-xl border-t border-white/5 pb-safe z-50">
-      <div className="flex justify-around items-center h-16">
-        {tabs.map((tab) => {
-          const active = pathname === tab.path || (pathname.startsWith('/orders') && tab.path === '/orders');
-          const Icon = tab.icon;
-          
-          return (
-            <button
-              key={tab.path}
-              onClick={() => navigate(tab.path)}
-              className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${active ? 'text-[#7C7FF5]' : 'text-[#8b92b8] hover:text-[#a5b4fc]'}`}
-            >
-              <Icon 
-                size={22} 
-                strokeWidth={active ? 3 : 2} 
-                className={active ? 'text-[#7C7FF5] drop-shadow-[0_0_8px_rgba(124,127,245,0.6)]' : 'text-[#8b92b8]'}
-              />
-              <span className={`text-[10px] font-bold ${active ? 'text-[#7C7FF5]' : 'text-[#8b92b8]'}`}>
-                {tab.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+    <nav
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '100%',
+        maxWidth: 'var(--max-w)',
+        zIndex: 100,
+        background: 'rgba(17, 19, 33, 0.96)',
+        backdropFilter: 'blur(18px)',
+        borderTop: '1px solid rgba(60,67,120,0.35)',
+        paddingBottom: 'var(--safe-bottom)',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+      }}
+    >
+      {tabs.map(({ to, icon: Icon, label }) => {
+        const active = pathname === to || (to !== '/' && pathname.startsWith(to));
+        return (
+          <Link
+            key={to}
+            to={to}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 3,
+              padding: '10px 4px 10px',
+              color: active ? '#858CF5' : '#9298C2',
+              transition: 'color 0.15s ease',
+            }}
+          >
+            <Icon size={22} strokeWidth={active ? 2.4 : 2} />
+            <span style={{ fontSize: 11, fontWeight: 600 }}>{label}</span>
+            <span
+              style={{
+                width: 5,
+                height: 5,
+                borderRadius: '50%',
+                background: active ? '#6F78F0' : 'transparent',
+                marginTop: 1,
+              }}
+            />
+          </Link>
+        );
+      })}
     </nav>
   );
 };
