@@ -100,25 +100,28 @@ const ProfilePage: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '14px 16px',
-                borderBottom: i < menu.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                borderBottom: i < menu.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                textDecoration: 'none',
+                color: 'inherit',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div
                   style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 11,
-                    background: 'var(--primary-soft)',
+                    width: 38,
+                    height: 38,
+                    borderRadius: 12,
+                    background: 'rgba(99,102,241,0.15)',
                     display: 'grid',
                     placeItems: 'center',
+                    flexShrink: 0,
                   }}
                 >
-                  <Icon size={17} color="var(--primary-light)" />
+                  <Icon size={18} color="#818cf8" />
                 </div>
-                <span style={{ fontSize: 14, fontWeight: 700 }}>{label}</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#F5F5F8' }}>{label}</span>
               </div>
-              <ChevronRight size={17} color="var(--text-muted)" />
+              <ChevronRight size={17} color="#8b92b8" />
             </a>
           ))}
         </div>

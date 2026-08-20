@@ -18,7 +18,6 @@ export const UcIcon: React.FC<IconProps> = ({ size = 48, className }) => (
       objectFit: 'contain',
       display: 'block',
       mixBlendMode: 'screen',
-      filter: 'drop-shadow(0 4px 18px rgba(212,170,0,0.55))',
     }}
     draggable={false}
   />
@@ -37,7 +36,6 @@ export const StarIcon: React.FC<IconProps> = ({ size = 48, className }) => (
       objectFit: 'contain',
       display: 'block',
       mixBlendMode: 'screen',
-      filter: 'drop-shadow(0 4px 18px rgba(250,200,0,0.55))',
     }}
     draggable={false}
   />

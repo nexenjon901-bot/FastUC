@@ -57,7 +57,7 @@ const HomePage: React.FC = () => {
         </button>
 
         {/* UC + Stars */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 14 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14 }}>
           <ServiceCard
             onClick={() => navigate('/catalog/uc')}
             icon={<UcIcon size={72} />}
@@ -86,38 +86,31 @@ const ServiceCard: React.FC<{
     onClick={onClick}
     style={{
       position: 'relative',
-      minHeight: 168,
-      padding: '16px 14px 14px',
-      borderRadius: 22,
+      width: '100%',
+      padding: '14px 16px',
+      borderRadius: 18,
       border: `1.5px solid ${C.border}`,
       background: C.card,
       cursor: 'pointer',
       textAlign: 'left',
       color: 'inherit',
       display: 'flex',
-      flexDirection: 'column',
+      flexDirection: 'row',
       alignItems: 'center',
-      gap: 10,
-      boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+      gap: 14,
+      boxShadow: 'none',
     }}
   >
-    <div style={{ display: 'flex', justifyContent: 'center', width: '100%', minHeight: 72 }}>{icon}</div>
-    <div style={{ width: '100%' }}>
-      <p style={{ fontSize: '0.85rem', fontWeight: 900, color: C.text, marginBottom: 6, lineHeight: 1.2, textTransform: 'uppercase' }}>
+    <div style={{ flexShrink: 0, width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {icon}
+    </div>
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <p style={{ fontSize: '0.82rem', fontWeight: 700, color: C.text, marginBottom: 3, lineHeight: 1.2, textTransform: 'uppercase' }}>
         {title}
       </p>
-      <p style={{ fontSize: '0.7rem', fontWeight: 500, color: C.muted, lineHeight: 1.4 }}>{desc}</p>
+      <p style={{ fontSize: '0.7rem', fontWeight: 400, color: C.muted, lineHeight: 1.4 }}>{desc}</p>
     </div>
-    <span
-      style={{
-        position: 'absolute',
-        right: 12,
-        bottom: 12,
-        color: C.accent,
-      }}
-    >
-      <ChevronRight size={18} strokeWidth={2.5} />
-    </span>
+    <ChevronRight size={18} strokeWidth={2.5} color={C.accent} style={{ flexShrink: 0 }} />
   </button>
 );
 
