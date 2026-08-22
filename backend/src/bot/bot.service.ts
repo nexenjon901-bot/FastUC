@@ -1,14 +1,17 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Bot, InlineKeyboard, session, Keyboard, Context, SessionFlavor } from 'grammy';
-import { conversations, createConversation, ConversationFlavor, Conversation } from '@grammyjs/conversations';
+import { conversations, createConversation, type ConversationFlavor, type Conversation } from '@grammyjs/conversations';
 import { PrismaService } from '../prisma/prisma.service';
 
 interface SessionData {
   editUserId?: string;
   broadcastMsgId?: number;
 }
-type MyContext = Context & SessionFlavor<SessionData> & ConversationFlavor;
+
+// Build context type in two steps to avoid circular reference
+type MyBaseContext = Context & SessionFlavor<SessionData>;
+type MyContext = MyBaseContext & ConversationFlavor<MyBaseContext>;
 type MyConversation = Conversation<MyContext>;
 
 @Injectable()
@@ -16,6 +19,7 @@ export class BotService implements OnModuleInit {
   private bot: Bot<MyContext> | undefined;
   private readonly logger = new Logger(BotService.name);
   private adminId: number | undefined;
+  private webAppUrl: string;
 
   constructor(
     private configService: ConfigService,
@@ -24,13 +28,14 @@ export class BotService implements OnModuleInit {
     const token = this.configService.get<string>('BOT_TOKEN');
     const adminIdStr = this.configService.get<string>('ADMIN_CHAT_ID');
     this.adminId = adminIdStr ? parseInt(adminIdStr, 10) : undefined;
+    this.webAppUrl = this.configService.get<string>('WEB_APP_URL') || 'https://t.me/fastpay_tgbot';
     
     if (!token) {
       this.logger.warn('BOT_TOKEN is not defined in .env. Bot will not start.');
       return;
     }
     
-    this.bot = new Bot(token);
+    this.bot = new Bot<MyContext>(token);
   }
 
   onModuleInit() {
@@ -140,12 +145,39 @@ export class BotService implements OnModuleInit {
   private setupMenus() {
     if (!this.bot) return;
     this.bot.command('start', async (ctx) => {
-      if (ctx.from?.id !== this.adminId && this.adminId !== undefined) {
-        return ctx.reply('Siz admin emassiz.');
+      // 1. Agar admin bo'lsa
+      if (this.adminId && ctx.from?.id === this.adminId) {
+        return await ctx.reply('FastUC Admin Paneliga xush kelibsiz!', {
+          reply_markup: this.getMainMenu(),
+        });
       }
-      await ctx.reply('FastUC Admin Paneliga xush kelibsiz!', {
-        reply_markup: this.getMainMenu(),
-      });
+
+      // 2. Oddiy foydalanuvchi
+      const firstName = ctx.from?.first_name || 'Foydalanuvchi';
+      
+      const welcomeMsg = `👋 Xush kelibsiz, ${firstName}\n\n` +
+        `Bu FastPAY — akkauntni ishonchli tarzda olishning eng tez yo'li.\n\n` +
+        `⚡ Qulay interfeys\n` +
+        `⚡ Qulay to'lov\n` +
+        `⚡ Escrow himoyasi\n\n` +
+        `🛍 Pastdagi tugmani bosing va hoziroq boshlang ⬇️`;
+
+      const keyboard = new InlineKeyboard().webApp('Xarid qilish 🚀', this.webAppUrl);
+
+      // Require path module at top, but we can just use simple relative path here
+      const { InputFile } = require('grammy');
+      const fs = require('fs');
+      const path = require('path');
+      const photoPath = path.join(process.cwd(), 'assets', 'welcome.jpg');
+      
+      if (fs.existsSync(photoPath)) {
+        await ctx.replyWithPhoto(new InputFile(photoPath), { 
+          caption: welcomeMsg, 
+          reply_markup: keyboard 
+        });
+      } else {
+        await ctx.reply(welcomeMsg, { reply_markup: keyboard });
+      }
     });
   }
 
