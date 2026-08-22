@@ -1,12 +1,19 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Bot, InlineKeyboard, session, Keyboard } from 'grammy';
-import { conversations, createConversation } from '@grammyjs/conversations';
+import { Bot, InlineKeyboard, session, Keyboard, Context, SessionFlavor } from 'grammy';
+import { conversations, createConversation, ConversationFlavor, Conversation } from '@grammyjs/conversations';
 import { PrismaService } from '../prisma/prisma.service';
+
+interface SessionData {
+  editUserId?: string;
+  broadcastMsgId?: number;
+}
+type MyContext = Context & SessionFlavor<SessionData> & ConversationFlavor;
+type MyConversation = Conversation<MyContext>;
 
 @Injectable()
 export class BotService implements OnModuleInit {
-  private bot: Bot | undefined;
+  private bot: Bot<MyContext> | undefined;
   private readonly logger = new Logger(BotService.name);
   private adminId: number | undefined;
 
@@ -32,6 +39,11 @@ export class BotService implements OnModuleInit {
     this.bot.use(session({ initial: () => ({}) }));
     this.bot.use(conversations());
 
+    // Register conversations
+    this.bot.use(createConversation(this.searchUserConversation.bind(this), 'search_user'));
+    this.bot.use(createConversation(this.broadcastConversation.bind(this), 'broadcast'));
+    this.bot.use(createConversation(this.editBalanceConversation.bind(this), 'edit_balance'));
+
     this.setupMenus();
     this.setupHandlers();
     
@@ -41,6 +53,81 @@ export class BotService implements OnModuleInit {
       }
     }).catch(err => this.logger.error('Failed to start bot', err));
   }
+
+  // --- CONVERSATIONS ---
+  
+  private async searchUserConversation(conversation: MyConversation, ctx: MyContext) {
+    await ctx.reply("Foydalanuvchi Telegram ID si yoki Username'ini (masalan, @nexenjon) yuboring:", {
+      reply_markup: { remove_keyboard: true }
+    });
+    const { message } = await conversation.wait();
+    const query = message?.text;
+    
+    if (!query) {
+      await ctx.reply("Bekor qilindi.", { reply_markup: this.getMainMenu() });
+      return;
+    }
+
+    let user;
+    if (query.startsWith('@')) {
+      user = await conversation.external(() => this.prisma.user.findFirst({ where: { username: query.replace('@', '') } }));
+    } else if (!isNaN(Number(query))) {
+      user = await conversation.external(() => this.prisma.user.findUnique({ where: { telegramId: BigInt(query) } }));
+    }
+
+    if (!user) {
+      await ctx.reply("❌ Foydalanuvchi topilmadi.", { reply_markup: this.getMainMenu() });
+      return;
+    }
+
+    const orderCount = await conversation.external(() => this.prisma.order.count({ where: { userId: user.id } }));
+    
+    const msg = `👤 FOYDALANUVCHI PROFILI\n🆔 ID: ${user.telegramId}\n👤 Username: ${user.username ? '@'+user.username : 'Yo\'q'}\n💰 Balans: ${user.balance} UZS\n🛒 Bajarilgan: ${orderCount} ta buyurtma`;
+    const keyboard = new InlineKeyboard()
+      .text('💰 Balansni o\'zgartirish', `edit_bal_${user.id}`);
+      
+    await ctx.reply(msg, { reply_markup: keyboard });
+    await ctx.reply("Asosiy menyu", { reply_markup: this.getMainMenu() });
+  }
+
+  private async editBalanceConversation(conversation: MyConversation, ctx: MyContext) {
+    const userId = ctx.session.editUserId;
+    if (!userId) return;
+    
+    await ctx.reply("Qancha summa qo'shish yoki ayirish kerakligini yozing.\n(Masalan, qo'shish uchun: `50000`, ayirish uchun: `-10000`)");
+    const { message } = await conversation.wait();
+    const amount = parseInt(message?.text || '0', 10);
+    
+    if (isNaN(amount) || amount === 0) {
+      await ctx.reply("❌ Xato miqdor kiritildi. Bekor qilindi.");
+      return;
+    }
+    
+    const user = await conversation.external(() => this.prisma.user.update({
+      where: { id: userId },
+      data: { balance: { increment: amount } }
+    }));
+    
+    await ctx.reply(`✅ Balans o'zgartirildi! Yangi balans: ${user.balance} UZS`);
+  }
+
+  private async broadcastConversation(conversation: MyConversation, ctx: MyContext) {
+    await ctx.reply("Barcha foydalanuvchilarga yubormoqchi bo'lgan xabaringizni yuboring (rasm, video yoki matn):", {
+      reply_markup: { remove_keyboard: true }
+    });
+    
+    const replyCtx = await conversation.wait();
+    if (!replyCtx.message) return;
+    
+    await ctx.reply("Barchaga yuboramizmi?", {
+      reply_markup: new InlineKeyboard().text('✅ Yuborish', 'confirm_broadcast').text('❌ Bekor qilish', 'cancel_broadcast')
+    });
+    
+    // Store message id in session to forward it later
+    ctx.session.broadcastMsgId = replyCtx.message.message_id;
+  }
+
+  // --- MENUS & HANDLERS ---
 
   private getMainMenu() {
     return new Keyboard()
@@ -64,7 +151,7 @@ export class BotService implements OnModuleInit {
 
   private setupHandlers() {
     if (!this.bot) return;
-    // Actions for main menu
+    
     this.bot.hears('📦 Buyurtmalar', async (ctx) => {
       if (ctx.from?.id !== this.adminId) return;
       const pendingOrders = await this.prisma.order.findMany({
@@ -120,12 +207,53 @@ export class BotService implements OnModuleInit {
       await ctx.reply(msg);
     });
 
-    // Dummy answers for the rest
-    this.bot.hears('👥 Mijozlar', ctx => ctx.reply('Mijozlarni qidirish (Tez kunda)'));
-    this.bot.hears('📢 Broadcast', ctx => ctx.reply('Ommaviy xabar yuborish (Tez kunda)'));
-    this.bot.hears('⚙️ Sozlamalar', ctx => ctx.reply('Sozlamalar paneli (Tez kunda)'));
+    this.bot.hears('👥 Mijozlar', async (ctx) => {
+      if (ctx.from?.id !== this.adminId) return;
+      await ctx.conversation.enter('search_user');
+    });
+
+    this.bot.hears('📢 Broadcast', async (ctx) => {
+      if (ctx.from?.id !== this.adminId) return;
+      await ctx.conversation.enter('broadcast');
+    });
+
+    this.bot.hears('⚙️ Sozlamalar', async (ctx) => {
+      if (ctx.from?.id !== this.adminId) return;
+      const msg = "⚙️ Tizim Sozlamalari\n\nHozirgi holat: 🟢 YONIQ\nTo'lov qabul: 🟢 YONIQ\nKarta: 8600 0000 0000 0000";
+      const kb = new InlineKeyboard()
+        .text('⏸ Botni to\'xtatish', 'toggle_maint')
+        .row()
+        .text('✏️ Karta raqamini o\'zgartirish', 'edit_card');
+      await ctx.reply(msg, { reply_markup: kb });
+    });
     
     // Callbacks
+    this.bot.callbackQuery('confirm_broadcast', async (ctx) => {
+      await ctx.editMessageText("Xabar tarqatilmoqda...");
+      const msgId = ctx.session.broadcastMsgId;
+      if (msgId && this.bot) {
+        const users = await this.prisma.user.findMany({ select: { telegramId: true } });
+        let success = 0;
+        for (const user of users) {
+          try {
+            await this.bot.api.copyMessage(Number(user.telegramId), ctx.from.id, msgId);
+            success++;
+          } catch(e) {}
+        }
+        await ctx.reply(`✅ Xabar ${success} ta foydalanuvchiga yuborildi!`, { reply_markup: this.getMainMenu() });
+      }
+    });
+
+    this.bot.callbackQuery('cancel_broadcast', async (ctx) => {
+      await ctx.editMessageText("❌ Ommaviy xabar bekor qilindi.");
+      await ctx.reply("Asosiy menyu", { reply_markup: this.getMainMenu() });
+    });
+
+    this.bot.callbackQuery(/^edit_bal_(.+)$/, async (ctx) => {
+      ctx.session.editUserId = ctx.match[1];
+      await ctx.conversation.enter('edit_balance');
+    });
+
     this.bot.callbackQuery(/^fulfill_order_(.+)$/, async (ctx) => {
       const orderId = ctx.match[1];
       await this.prisma.order.update({

@@ -16,30 +16,34 @@ const ProductCard: React.FC<Props> = ({ product, selected, onSelect }) => {
   return (
     <button
       onClick={() => onSelect(product)}
-      className={`relative text-left rounded-2xl p-3.5 transition-all active:scale-[0.97] ${
+      className={`relative flex flex-col items-center justify-center rounded-[18px] p-4 transition-all active:scale-[0.97] min-h-[180px] ${
         selected
           ? isStars
-            ? 'bg-gradient-to-br from-yellow-500/15 to-[#1e2040] border-2 border-yellow-400 shadow-[0_0_0_3px_rgba(250,204,21,0.12)]'
-            : 'bg-gradient-to-br from-indigo-500/15 to-[#1e2040] border-2 border-indigo-400 shadow-[0_0_0_3px_rgba(99,102,241,0.15)]'
-          : 'card border border-white/6'
+            ? 'bg-[#181932] border-2 border-yellow-400'
+            : 'bg-[#181932] border-2 border-[#5a67d8]'
+          : 'bg-[#181932] border border-[#2b2d55]'
       }`}
     >
       {selected && (
         <span
-          className={`absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center ${
-            isStars ? 'bg-yellow-400 text-black' : 'bg-indigo-500 text-white'
+          className={`absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center ${
+            isStars ? 'bg-yellow-400 text-black' : 'bg-[#5a67d8] text-white'
           }`}
         >
           <Check size={12} strokeWidth={3} />
         </span>
       )}
-      <div className="mb-2">{isStars ? <StarIcon size={36} /> : <UcIcon size={36} />}</div>
-      <p className="text-white font-black text-base mb-1">
-        {isStars ? `${product.amount} ⭐` : `${product.amount} UC`}
-      </p>
-      <p className={`text-xs font-bold ${isStars ? 'text-yellow-400' : 'text-indigo-300'}`}>
-        {formatUzs(product.price)}
-      </p>
+      <div className="flex-1 flex items-center justify-center mb-4">
+        {isStars ? <StarIcon size={76} /> : <UcIcon size={76} />}
+      </div>
+      <div className="text-center w-full">
+        <p className="text-white font-bold text-[15px] mb-1.5">
+          {isStars ? `${product.amount} Stars` : `${product.amount} UC`}
+        </p>
+        <p className={`text-[13px] font-semibold ${isStars ? 'text-[#6366f1]' : 'text-[#6366f1]'}`}>
+          {formatUzs(product.price)}
+        </p>
+      </div>
     </button>
   );
 };

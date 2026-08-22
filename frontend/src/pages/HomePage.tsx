@@ -32,28 +32,44 @@ const HomePage: React.FC = () => {
           onClick={() => navigate('/catalog/accounts')}
           style={{
             width: '100%',
-            border: `1.5px solid ${C.border}`,
+            border: 'none',
             padding: 0,
             cursor: 'pointer',
             borderRadius: 20,
             overflow: 'hidden',
-            background: '#0d1020',
             display: 'block',
             lineHeight: 0,
+            position: 'relative',
           }}
         >
           <img
-            src="/accounts-banner.png"
+            src="/accounts-banner.jpg"
             alt="PUBG Akkauntlar"
             style={{
               width: '100%',
               height: 'auto',
-              aspectRatio: '16 / 9',
-              objectFit: 'cover',
-              objectPosition: 'left center',
               display: 'block',
+              borderRadius: 20,
             }}
           />
+          {/* Ko'rish overlay */}
+          <div style={{
+            position: 'absolute',
+            bottom: 12,
+            right: 14,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            background: 'rgba(0,0,0,0.45)',
+            backdropFilter: 'blur(6px)',
+            borderRadius: 20,
+            padding: '4px 10px',
+            fontSize: '0.7rem',
+            fontWeight: 700,
+            color: '#fff',
+          }}>
+            Ko'rish <ChevronRight size={12} strokeWidth={2.5} />
+          </div>
         </button>
 
         {/* UC + Stars */}

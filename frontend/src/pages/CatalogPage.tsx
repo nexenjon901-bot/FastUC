@@ -156,7 +156,7 @@ const CatalogPage: React.FC = () => {
             )}
 
             <p className="section-label">{isUC ? 'UC paketlari' : 'Stars paketlari'}</p>
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-2 gap-3.5">
               {loading
                 ? Array.from({ length: 6 }).map((_, i) => (
                     <div key={i} className="shimmer h-28 rounded-2xl" />
