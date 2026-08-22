@@ -57,7 +57,7 @@ const HomePage: React.FC = () => {
         </button>
 
         {/* UC + Stars */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 14 }}>
           <ServiceCard
             onClick={() => navigate('/catalog/uc')}
             icon={<UcIcon size={72} />}
@@ -86,31 +86,34 @@ const ServiceCard: React.FC<{
     onClick={onClick}
     style={{
       position: 'relative',
-      width: '100%',
-      padding: '14px 16px',
-      borderRadius: 18,
+      minHeight: 160,
+      padding: '20px 14px 14px',
+      borderRadius: 22,
       border: `1.5px solid ${C.border}`,
       background: C.card,
       cursor: 'pointer',
       textAlign: 'left',
       color: 'inherit',
       display: 'flex',
-      flexDirection: 'row',
+      flexDirection: 'column',
       alignItems: 'center',
-      gap: 14,
-      boxShadow: 'none',
+      gap: 12,
+      boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+      width: '100%',
     }}
   >
-    <div style={{ flexShrink: 0, width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: 72 }}>
       {icon}
     </div>
-    <div style={{ flex: 1, minWidth: 0 }}>
-      <p style={{ fontSize: '0.82rem', fontWeight: 700, color: C.text, marginBottom: 3, lineHeight: 1.2, textTransform: 'uppercase' }}>
+    <div style={{ width: '100%', textAlign: 'center' }}>
+      <p style={{ fontSize: '0.88rem', fontWeight: 700, color: C.text, marginBottom: 4, lineHeight: 1.2 }}>
         {title}
       </p>
       <p style={{ fontSize: '0.7rem', fontWeight: 400, color: C.muted, lineHeight: 1.4 }}>{desc}</p>
     </div>
-    <ChevronRight size={18} strokeWidth={2.5} color={C.accent} style={{ flexShrink: 0 }} />
+    <span style={{ position: 'absolute', right: 10, bottom: 10, color: C.accent }}>
+      <ChevronRight size={16} strokeWidth={2.5} />
+    </span>
   </button>
 );
 
