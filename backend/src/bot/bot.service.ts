@@ -135,8 +135,8 @@ export class BotService implements OnModuleInit {
   private setupMenus() {
     if (!this.bot) return;
     this.bot.command('start', async (ctx) => {
-      const userId = ctx.from?.id || '';
-      const welcomeMsg = `👋 Xush Kelibsiz! Hurmatli mijoz ${userId}\n\n` +
+      const username = ctx.from?.username ? `@${ctx.from.username}` : (ctx.from?.first_name || 'Mijoz');
+      const welcomeMsg = `👋 Xush Kelibsiz! Hurmatli ${username}\n\n` +
         `Bu FastUC - donat va akkaunt sotib olishni eng oson usuli.\n\n` +
         `📱 Qulay interfeys\n` +
         `⚡ Tezkor to'lov tizimi\n` +

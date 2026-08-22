@@ -1,0 +1,26 @@
+﻿services:
+  - type: web
+    name: fastuc-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_CHAT_ID
+        sync: false
+      - key: WEB_APP_URL
+        value: https://fast-pay-topaz.vercel.app
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: COINDROP_API_KEY
+        sync: false
