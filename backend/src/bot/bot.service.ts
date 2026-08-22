@@ -135,11 +135,13 @@ export class BotService implements OnModuleInit {
   private setupMenus() {
     if (!this.bot) return;
     this.bot.command('start', async (ctx) => {
-      const firstName = ctx.from?.first_name || 'Foydalanuvchi';
-      const welcomeMsg = `👋 Xush kelibsiz, ${firstName}\n\n` +
-        `Bu FastPAY — ishonchli tarzda to'lovlarni amalga oshirishning eng tez yo'li.\n\n` +
-        `⚡ Qulay interfeys\n` +
-        `🛍 Pastdagi tugmani bosing va hoziroq boshlang ⬇️`;
+      const userId = ctx.from?.id || '';
+      const welcomeMsg = `👋 Xush Kelibsiz! Hurmatli mijoz ${userId}\n\n` +
+        `Bu FastUC - donat va akkaunt sotib olishni eng oson usuli.\n\n` +
+        `📱 Qulay interfeys\n` +
+        `⚡ Tezkor to'lov tizimi\n` +
+        `🛡 Escrow himoyasi\n\n` +
+        `👇 Pastdagi "Xarid qilish 🚀" tugmasini bosing va hoziroq boshlang!`;
         
       const keyboard = new InlineKeyboard().webApp('Xarid qilish 🚀', 'https://fast-pay-topaz.vercel.app/');
       const photoPath = path.join(process.cwd(), 'assets', 'welcome.jpg');
