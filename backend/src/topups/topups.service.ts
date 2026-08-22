@@ -1,10 +1,11 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TopupStatus } from '@prisma/client';
+import { BotService } from '../bot/bot.service';
 
 @Injectable()
 export class TopupsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private botService: BotService) {}
 
   async createTopup(userId: string, amountUzs: number, method: string) {
     const MIN = 5000;
@@ -12,7 +13,7 @@ export class TopupsService {
       throw new BadRequestException(`Minimal to'lov summasi — ${MIN} UZS`);
     }
 
-    return this.prisma.topup.create({
+    const topup = await this.prisma.topup.create({
       data: {
         userId,
         amountUzs,
@@ -20,6 +21,9 @@ export class TopupsService {
         status: 'PENDING',
       },
     });
+    
+    this.botService.notifyNewTopup(topup.id);
+    return topup;
   }
 
   async getMyTopups(userId: string) {

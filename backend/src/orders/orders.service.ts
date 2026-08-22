@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
+import { BotService } from '../bot/bot.service';
+
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private botService: BotService) {}
 
   async createOrder(userId: string, productId: string, targetId: string) {
-    return this.prisma.$transaction(async (tx) => {
+    const order = await this.prisma.$transaction(async (tx) => {
       const product = await tx.product.findUnique({ where: { id: productId } });
       if (!product || !product.isActive) {
         throw new NotFoundException('Mahsulot topilmadi yoki mavjud emas');
@@ -26,7 +28,7 @@ export class OrdersService {
       });
 
       // Create order
-      const order = await tx.order.create({
+      return tx.order.create({
         data: {
           userId,
           productId,
@@ -36,9 +38,10 @@ export class OrdersService {
         },
         include: { product: true },
       });
-
-      return order;
     });
+
+    this.botService.notifyNewOrder(order.id);
+    return order;
   }
 
   async getMyOrders(userId: string) {
