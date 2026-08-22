@@ -10,6 +10,7 @@ import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
 import { TopupsModule } from './topups/topups.module';
 import { BotModule } from './bot/bot.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { BotModule } from './bot/bot.module';
         '.env',
       ],
     }),
+    SettingsModule,
     PrismaModule,
     UsersModule,
     AuthModule,

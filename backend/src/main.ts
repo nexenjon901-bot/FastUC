@@ -2,6 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
+// Fix BigInt serialization for JSON responses (Prisma uses BigInt for telegramId)
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
