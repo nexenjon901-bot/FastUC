@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { OrderStatus, AccountStatus, TransactionType } from '@prisma/client';
+import { OrderStatus, AccountStatus, TransactionType, ProductType } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
@@ -33,10 +33,18 @@ export class OrdersService {
         data: {
           orderNumber,
           buyerId,
-          accountId,
-          amount: account.price,
+          totalAmount: account.price,
           status: OrderStatus.ESCROW_HELD,
           escrowStep: 1,
+          items: {
+            create: {
+              productType: ProductType.ACCOUNT,
+              productId: account.id,
+              accountId: account.id,
+              price: account.price,
+              quantity: 1
+            }
+          }
         },
       });
 
@@ -63,7 +71,10 @@ export class OrdersService {
 
   async confirmOrder(buyerId: string, orderId: string) {
     return this.prisma.$transaction(async (tx) => {
-      const order = await tx.order.findUnique({ where: { id: orderId } });
+      const order = await tx.order.findUnique({ 
+        where: { id: orderId },
+        include: { items: true }
+      });
       if (!order || order.buyerId !== buyerId) {
         throw new NotFoundException('Order not found');
       }
@@ -81,14 +92,13 @@ export class OrdersService {
         },
       });
 
-      await tx.account.update({
-        where: { id: order.accountId },
-        data: { status: AccountStatus.SOLD },
-      });
-
-      // The money is released to admin balance (or handled out of band)
-      // Since admin owns all accounts, we don't necessarily update a specific seller's balance,
-      // but if we did, we would create an ESCROW_RELEASE transaction for the admin here.
+      const accountItem = order.items.find(i => i.productType === 'ACCOUNT');
+      if (accountItem && accountItem.accountId) {
+        await tx.account.update({
+          where: { id: accountItem.accountId },
+          data: { status: AccountStatus.SOLD },
+        });
+      }
 
       return updatedOrder;
     });
@@ -99,9 +109,13 @@ export class OrdersService {
       where: { buyerId: userId },
       orderBy: { createdAt: 'desc' },
       include: {
-        account: {
-          select: { title: true, rank: true, images: true },
-        },
+        items: {
+          include: {
+            account: {
+              select: { title: true, rank: true, images: true }
+            }
+          }
+        }
       },
     });
   }
@@ -110,9 +124,13 @@ export class OrdersService {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
       include: {
-        account: {
-          select: { title: true, rank: true, images: true },
-        },
+        items: {
+          include: {
+            account: {
+              select: { title: true, rank: true, images: true }
+            }
+          }
+        }
       },
     });
     if (!order) throw new NotFoundException('Order not found');
@@ -132,3 +150,4 @@ export class OrdersService {
     });
   }
 }
+
