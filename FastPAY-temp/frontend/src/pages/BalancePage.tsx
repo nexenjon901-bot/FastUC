@@ -4,8 +4,13 @@ import api from '../api';
 import Header from '../components/Header';
 
 const C = {
-  bg: '#181927', card: '#252642', card2: '#1e1f3a',
-  border: '#3C4172', accent: '#737DE4', text: '#F5F5F8', muted: '#858BB8',
+  bg: '#111321',
+  card: '#202440',
+  card2: '#1a1d36',
+  border: '#3C4378',
+  accent: '#6F78F0',
+  text: '#F5F5FF',
+  muted: '#9298C2',
 };
 
 const BalancePage: React.FC = () => {
@@ -14,6 +19,12 @@ const BalancePage: React.FC = () => {
   const [amount, setAmount] = useState<string>('');
   const [showModal, setShowModal] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  
+  // Status tracking
+  const [status, setStatus] = useState<'IDLE' | 'PENDING' | 'APPROVED' | 'REJECTED'>('IDLE');
+  const [pendingRequestId, setPendingRequestId] = useState<string | null>(null);
+
   const submitLock = useRef(false);
 
   const triggerHaptic = (style: 'light' | 'medium' | 'heavy' = 'light') => {
@@ -39,34 +50,94 @@ const BalancePage: React.FC = () => {
       } catch (e) {}
     };
     fetchBalance();
-    const interval = setInterval(() => fetchBalance(true), 5000);
+    
+    // We only poll balance if not waiting for a specific request
+    const interval = setInterval(() => {
+      if (status !== 'PENDING') fetchBalance(true);
+    }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [status]);
+
+  // Polling logic when PENDING
+  useEffect(() => {
+    if (status !== 'PENDING' || !pendingRequestId) return;
+    
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get('/payments/topup-requests/me');
+        const req = res.data.find((r: any) => r.id === pendingRequestId);
+        if (req) {
+          if (req.status === 'APPROVED') {
+            setStatus('APPROVED');
+            triggerHaptic('heavy');
+            // optionally refresh balance immediately
+            api.get('/users/me').then(u => setBalance(Number(u.data.balance) || 0));
+          } else if (req.status === 'REJECTED') {
+            setStatus('REJECTED');
+            triggerHaptic('heavy');
+          }
+        }
+      } catch (error) {
+        console.error('Polling error', error);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [status, pendingRequestId]);
 
   const handleMethodClick = (method: string) => {
     triggerHaptic();
     setSelectedMethod(method);
     setAmount('');
+    setFile(null);
     setShowModal(true);
   };
 
-  const buildMessage = () => {
-    const num = parseInt(amount.replace(/\D/g, ''), 10);
-    if (selectedMethod === 'BANKOMAT') return `Bankomat orqali pul o'tkazmoqchi edim, adres bering ${num.toLocaleString('uz-UZ')} UZS`;
-    return `Pul o'tkazmoqchi edim, karta raqam bering ${num.toLocaleString('uz-UZ')} UZS`;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (submitLock.current) return;
     const numAmount = parseInt(amount.replace(/\D/g, ''), 10);
-    if (!numAmount || numAmount < 5000) { triggerHaptic('heavy'); alert("Eng kam to'lov miqdori 5,000 UZS"); return; }
+    if (!numAmount || numAmount < 5000) { 
+      triggerHaptic('heavy'); 
+      if (window.Telegram?.WebApp?.showAlert) window.Telegram.WebApp.showAlert("Eng kam to'lov miqdori 5,000 UZS");
+      else alert("Eng kam to'lov miqdori 5,000 UZS");
+      return; 
+    }
+    if (!file) {
+      triggerHaptic('heavy'); 
+      if (window.Telegram?.WebApp?.showAlert) window.Telegram.WebApp.showAlert("Iltimos, to'lov chekini yuklang");
+      else alert("Iltimos, to'lov chekini yuklang");
+      return;
+    }
+
     submitLock.current = true;
     triggerHaptic('medium');
-    const url = `https://t.me/FastUC_support?text=${encodeURIComponent(buildMessage())}`;
-    if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
-    else window.open(url, '_blank');
-    setShowModal(false); setAmount('');
-    setTimeout(() => { submitLock.current = false; }, 2000);
+    
+    try {
+      const formData = new FormData();
+      formData.append('amount', numAmount.toString());
+      formData.append('method', selectedMethod);
+      formData.append('receipt', file);
+
+      const res = await api.post('/payments/topup-requests', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      setShowModal(false);
+      setPendingRequestId(res.data.id);
+      setStatus('PENDING');
+    } catch (error: any) {
+      const msg = error.response?.data?.message || "Xatolik yuz berdi";
+      if (window.Telegram?.WebApp?.showAlert) window.Telegram.WebApp.showAlert(msg);
+      else alert(msg);
+    } finally {
+      submitLock.current = false;
+    }
   };
 
   const PAYMENT_METHODS = [
@@ -92,8 +163,58 @@ const BalancePage: React.FC = () => {
     },
   ];
 
+  if (status === 'PENDING') {
+    return (
+      <div className="page-container" style={{ background: C.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <div style={{ width: 80, height: 80, borderRadius: '50%', border: `4px solid ${C.border}`, borderTopColor: C.accent, animation: 'spin 1s linear infinite', marginBottom: 20 }} />
+        <h2 style={{ color: C.text, fontWeight: 900, fontSize: '1.4rem', marginBottom: 10 }}>Tekshirilmoqda...</h2>
+        <p style={{ color: C.muted, textAlign: 'center', fontSize: '0.9rem' }}>
+          To'lovingiz adminlar tomonidan tekshirilmoqda. Iltimos kuting, bu bir necha daqiqa vaqt olishi mumkin.
+        </p>
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (status === 'APPROVED') {
+    return (
+      <div className="page-container" style={{ background: C.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(34,197,94,0.1)', border: '2px solid rgba(34,197,94,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+          <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </div>
+        <h2 style={{ color: C.text, fontWeight: 900, fontSize: '1.4rem', marginBottom: 10 }}>Tasdiqlandi!</h2>
+        <p style={{ color: C.muted, textAlign: 'center', fontSize: '0.9rem', marginBottom: 30 }}>
+          Hisobingiz muvaffaqiyatli to'ldirildi. Yangi balans: <b>{balance.toLocaleString()} UZS</b>
+        </p>
+        <button onClick={() => { setStatus('IDLE'); setAmount(''); setFile(null); navigate(-1); }} style={{ background: C.accent, color: '#fff', fontWeight: 800, padding: '14px 30px', borderRadius: 16, border: 'none', cursor: 'pointer', fontSize: '0.95rem' }}>
+          Davom etish
+        </button>
+      </div>
+    );
+  }
+
+  if (status === 'REJECTED') {
+    return (
+      <div className="page-container" style={{ background: C.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(244,63,94,0.1)', border: '2px solid rgba(244,63,94,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+          <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="#f43f5e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </div>
+        <h2 style={{ color: C.text, fontWeight: 900, fontSize: '1.4rem', marginBottom: 10 }}>Rad etildi</h2>
+        <p style={{ color: C.muted, textAlign: 'center', fontSize: '0.9rem', marginBottom: 30 }}>
+          To'lovingiz tasdiqlanmadi. Agar xatolik bo'lsa qullab quvvatlash xizmatiga murojaat qiling.
+        </p>
+        <button onClick={() => setStatus('IDLE')} style={{ background: C.accent, color: '#fff', fontWeight: 800, padding: '14px 30px', borderRadius: 16, border: 'none', cursor: 'pointer', fontSize: '0.95rem', marginBottom: 12 }}>
+          Qayta urinish
+        </button>
+        <button onClick={() => window.open('https://t.me/FastUC_support', '_blank')} style={{ background: 'transparent', color: C.muted, fontWeight: 700, padding: '10px 20px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>
+          Supportga yozish
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="page-container" style={{ background: C.bg }}>
+    <div className="page-container" style={{ background: C.bg, overflowY: 'auto' }}>
       <Header balance={balance} />
 
       <div style={{ padding: '16px' }}>
@@ -135,7 +256,7 @@ const BalancePage: React.FC = () => {
             <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
           <p style={{ color: C.muted, fontSize: '0.75rem', lineHeight: 1.6 }}>
-            To'lov bossgandan so'ng admin bilan bog'lanasiz. Pul o'tkazilgandan keyin balans 5 daqiqa ichida to'ldiriladi.
+            To'lov chekini yuklaganingizdan so'ng, u adminlar tomonidan tekshiriladi va tasdiqlanganda hisobingiz darhol to'ldiriladi.
           </p>
         </div>
       </div>
@@ -143,19 +264,19 @@ const BalancePage: React.FC = () => {
       {/* Modal */}
       {showModal && (
         <div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px' }}
-          onClick={e => { if (e.target === e.currentTarget) { setShowModal(false); setAmount(''); } }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px', overflowY: 'auto' }}
+          onClick={e => { if (e.target === e.currentTarget) { setShowModal(false); setAmount(''); setFile(null); } }}
         >
           <div
             className="animate-fade-in-up"
-            style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 28, padding: '28px 20px 24px', width: '100%', maxWidth: 420, position: 'relative' }}
+            style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 28, padding: '28px 20px 24px', width: '100%', maxWidth: 420, position: 'relative', margin: 'auto' }}
           >
             {/* Handle */}
             <div style={{ width: 40, height: 4, background: C.border, borderRadius: 4, margin: '0 auto 20px' }}/>
 
             {/* Close */}
             <button
-              onClick={() => { triggerHaptic(); setShowModal(false); setAmount(''); }}
+              onClick={() => { triggerHaptic(); setShowModal(false); setAmount(''); setFile(null); }}
               style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', color: C.muted, cursor: 'pointer', padding: 4 }}
             >
               <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/></svg>
@@ -173,20 +294,26 @@ const BalancePage: React.FC = () => {
                 {selectedMethod === 'BANKOMAT' ? 'Bankomat' : 'UZCARD / HUMO'}
               </span>
             </div>
+            
+            <p style={{ color: C.muted, fontSize: '0.8rem', marginBottom: 12 }}>
+              Iltimos quyidagi raqamga to'lovni bajaring: <br />
+              <b style={{ color: C.text, fontSize: '1.1rem' }}>
+                {selectedMethod === 'BANKOMAT' ? '8600 0000 0000 0000' : '8600 0000 0000 0000'}
+              </b>
+            </p>
 
             <h2 style={{ color: C.text, fontWeight: 900, fontSize: '1.25rem', marginBottom: 6 }}>Summani kiriting</h2>
-            <p style={{ color: C.muted, fontSize: '0.78rem', marginBottom: 20 }}>
+            <p style={{ color: C.muted, fontSize: '0.78rem', marginBottom: 12 }}>
               Minimal miqdor: <strong style={{ color: C.text }}>5,000 UZS</strong>
             </p>
 
             {/* Amount input */}
-            <div style={{ position: 'relative', marginBottom: 20 }}>
+            <div style={{ position: 'relative', marginBottom: 16 }}>
               <input
                 type="number"
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
                 placeholder="5000"
-                autoFocus
                 style={{
                   width: '100%',
                   background: C.card2,
@@ -225,12 +352,51 @@ const BalancePage: React.FC = () => {
                 </button>
               ))}
             </div>
+            
+            <h2 style={{ color: C.text, fontWeight: 900, fontSize: '1.1rem', marginBottom: 6 }}>Chekni yuklang</h2>
+            <div style={{ marginBottom: 20 }}>
+              <label 
+                htmlFor="receipt-upload" 
+                style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  background: C.card2, 
+                  border: `2px dashed ${file ? C.accent : C.border}`, 
+                  borderRadius: 16, 
+                  padding: '24px 16px', 
+                  cursor: 'pointer',
+                  transition: 'border-color 0.2s',
+                  textAlign: 'center'
+                }}
+              >
+                <svg width="28" height="28" fill="none" viewBox="0 0 24 24" style={{ marginBottom: 8, color: file ? C.accent : C.muted }}>
+                  <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                {file ? (
+                  <span style={{ color: C.accent, fontSize: '0.85rem', fontWeight: 700 }}>{file.name}</span>
+                ) : (
+                  <>
+                    <span style={{ color: C.text, fontSize: '0.85rem', fontWeight: 700 }}>Rasm yuklash (skrinshot)</span>
+                    <span style={{ color: C.muted, fontSize: '0.75rem', marginTop: 4 }}>JPEG, PNG (max 5MB)</span>
+                  </>
+                )}
+              </label>
+              <input 
+                id="receipt-upload" 
+                type="file" 
+                accept="image/*" 
+                onChange={handleFileChange} 
+                style={{ display: 'none' }} 
+              />
+            </div>
 
             <button
               onClick={handleConfirm}
-              style={{ width: '100%', background: C.accent, color: '#fff', fontWeight: 800, padding: '16px', borderRadius: 16, border: 'none', cursor: 'pointer', fontSize: '0.95rem', letterSpacing: '0.3px' }}
+              style={{ width: '100%', background: C.accent, color: '#fff', fontWeight: 800, padding: '16px', borderRadius: 16, border: 'none', cursor: 'pointer', fontSize: '0.95rem', letterSpacing: '0.3px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
             >
-              Adminga yozish →
+              Yuborish
             </button>
           </div>
         </div>
@@ -240,3 +406,4 @@ const BalancePage: React.FC = () => {
 };
 
 export default BalancePage;
+

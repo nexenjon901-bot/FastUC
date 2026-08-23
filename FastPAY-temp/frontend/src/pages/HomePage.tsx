@@ -4,12 +4,12 @@ import api from '../api';
 import Header from '../components/Header';
 
 const C = {
-  bg: '#181927',
-  card: '#252642',
-  border: '#3C4172',
-  accent: '#737DE4',
-  text: '#F5F5F8',
-  muted: '#858BB8',
+  bg: '#111321',
+  card: '#202440',
+  border: '#3C4378',
+  accent: '#6F78F0',
+  text: '#F5F5FF',
+  muted: '#9298C2',
 };
 
 const categories = [
@@ -18,13 +18,13 @@ const categories = [
     path: '/accounts',
     title: 'PUBG AKKAUNTLAR',
     sub: 'Tayyor akkauntlar sotiladi',
-    color: '#737DE4',
-    bg: 'rgba(115,125,228,0.1)',
+    color: '#6F78F0',
+    bg: 'rgba(111,120,240,0.1)',
     icon: (
       <svg width="38" height="38" fill="none" viewBox="0 0 24 24">
-        <rect x="2" y="4" width="20" height="16" rx="3" stroke="#737DE4" strokeWidth="2"/>
-        <circle cx="8" cy="12" r="2.5" fill="#737DE4" fillOpacity="0.4" stroke="#737DE4" strokeWidth="1.5"/>
-        <path d="M14 9h4M14 12h3M14 15h2" stroke="#737DE4" strokeWidth="2" strokeLinecap="round"/>
+        <rect x="2" y="4" width="20" height="16" rx="3" stroke="#6F78F0" strokeWidth="2"/>
+        <circle cx="8" cy="12" r="2.5" fill="#6F78F0" fillOpacity="0.4" stroke="#6F78F0" strokeWidth="1.5"/>
+        <path d="M14 9h4M14 12h3M14 15h2" stroke="#6F78F0" strokeWidth="2" strokeLinecap="round"/>
       </svg>
     ),
     bannerImg: 'https://wallpaperaccess.com/full/1636859.jpg',
@@ -35,10 +35,10 @@ const categories = [
     path: '/accounts?tab=uc',
     title: 'PUBG UC',
     sub: 'Tez va xavfsiz UC sotib oling',
-    color: '#737DE4',
-    bg: 'rgba(115,125,228,0.08)',
+    color: '#6F78F0',
+    bg: 'rgba(111,120,240,0.08)',
     icon: (
-      <img src="/uc.jpg" alt="UC" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px' }} />
+      <img src="/uc.jpg" alt="UC" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px', mixBlendMode: 'screen' }} />
     ),
   },
   {
@@ -49,7 +49,7 @@ const categories = [
     color: '#facc15',
     bg: 'rgba(250,204,21,0.08)',
     icon: (
-      <img src="/stars.jpg" alt="Stars" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px' }} />
+      <img src="/stars.jpg" alt="Stars" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px', mixBlendMode: 'screen' }} />
     ),
   },
 ];
@@ -105,7 +105,7 @@ const HomePage: React.FC = () => {
             style={{ height: 180, border: `1.5px solid ${C.border}` }}
           >
             <img
-              src="https://wallpaperaccess.com/full/1636859.jpg"
+              src="/banner.jpg"
               alt="PUBG"
               className="w-full h-full object-cover"
               style={{ display: 'block' }}
@@ -152,8 +152,8 @@ const HomePage: React.FC = () => {
                   boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
                 }}
               >
-                {/* Icon bg */}
-                <div style={{ background: cat.bg, borderRadius: 16, width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                {/* Icon */}
+                <div style={{ width: 64, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
                   {cat.icon}
                 </div>
 

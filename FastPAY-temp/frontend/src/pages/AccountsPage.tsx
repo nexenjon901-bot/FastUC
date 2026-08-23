@@ -4,13 +4,13 @@ import api from '../api';
 import Header from '../components/Header';
 
 const C = {
-  bg: '#181927',
-  card: '#252642',
-  card2: '#1e1f3a',
-  border: '#3C4172',
-  accent: '#737DE4',
-  text: '#F5F5F8',
-  muted: '#858BB8',
+  bg: '#111321',
+  card: '#202440',
+  card2: '#1a1d36',
+  border: '#3C4378',
+  accent: '#6F78F0',
+  text: '#F5F5FF',
+  muted: '#9298C2',
 };
 
 const UC_PACKAGES = [

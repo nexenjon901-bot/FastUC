@@ -9,8 +9,8 @@ const navItems = [
   { path: '/profile', labelKey: 'nav.profile', label: 'Profil', icon: UserIcon },
 ];
 
-const ACTIVE_COLOR = '#737DE4';
-const MUTED_COLOR = '#858BB8';
+const ACTIVE_COLOR = '#6F78F0';
+const MUTED_COLOR = '#9298C2';
 
 function HomeIcon({ active }: { active: boolean }) {
   return (
@@ -72,7 +72,7 @@ const BottomNav: React.FC = () => {
             </span>
             {isActive && (
               <span
-                style={{ background: '#737DE4', width: 4, height: 4, borderRadius: '50%', position: 'absolute', bottom: 4 }}
+                style={{ background: '#6F78F0', width: 4, height: 4, borderRadius: '50%', position: 'absolute', bottom: 4 }}
               />
             )}
           </button>

@@ -1,19 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
-/* ─── TezPIN Design Tokens ─── */
+/* ─── FastUC Design Tokens ─── */
 @theme {
-  --color-bg:          #181927;
-  --color-bg-card:     #252642;
-  --color-bg-card2:    #1e1f3a;
-  --color-border:      #3C4172;
-  --color-accent:      #737DE4;
-  --color-accent-dark: #5a63c8;
-  --color-text:        #F5F5F8;
-  --color-text-muted:  #858BB8;
-  --color-success:     #22c55e;
-  --color-danger:      #f43f5e;
-  --color-warning:     #facc15;
+  --color-bg:          #111321;
+  --color-bg-card:     #202440;
+  --color-bg-card2:    #1a1d36;
+  --color-border:      #3C4378;
+  --color-accent:      #6F78F0;
+  --color-accent-light: #858CF5;
+  --color-text:        #F5F5FF;
+  --color-text-muted:  #9298C2;
+  --color-success:     #36D399;
+  --color-danger:      #F87171;
+  --color-warning:     #FBBF24;
 
   --font-sans: 'Outfit', system-ui, sans-serif;
   --radius-card: 22px;
@@ -36,28 +36,28 @@
   }
 
   body {
-    background-color: #181927;
-    color: #F5F5F8;
+    background-color: #111321;
+    color: #F5F5FF;
     font-family: 'Outfit', system-ui, sans-serif;
   }
 
   ::-webkit-scrollbar { width: 3px; }
-  ::-webkit-scrollbar-track { background: #252642; }
-  ::-webkit-scrollbar-thumb { background: #737DE4; border-radius: 2px; }
+  ::-webkit-scrollbar-track { background: #202440; }
+  ::-webkit-scrollbar-thumb { background: #6F78F0; border-radius: 2px; }
 }
 
 /* ─── Card ─── */
 .card {
-  background: #252642;
+  background: #202440;
   border-radius: 22px;
   padding: 18px;
-  border: 1px solid #3C4172;
+  border: 1px solid #3C4378;
 }
 
 /* ─── Buttons ─── */
 .btn-primary {
-  background: #737DE4;
-  color: #F5F5F8;
+  background: #6F78F0;
+  color: #F5F5FF;
   font-weight: 700;
   border-radius: 16px;
   padding: 0.875rem 1.5rem;
@@ -76,8 +76,8 @@
 .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .btn-secondary {
-  border: 1px solid #3C4172;
-  color: #737DE4;
+  border: 1px solid #3C4378;
+  color: #6F78F0;
   font-weight: 600;
   border-radius: 16px;
   padding: 0.75rem 1.5rem;
@@ -90,13 +90,13 @@
   font-size: 0.95rem;
   font-family: inherit;
 }
-.btn-secondary:hover { background: rgba(115, 125, 228, 0.1); }
+.btn-secondary:hover { background: rgba(111, 120, 240, 0.1); }
 .btn-secondary:active { transform: scale(0.97); }
 
 .btn-danger {
-  border: 1px solid #f43f5e;
-  color: #f43f5e;
-  background: rgba(244, 63, 94, 0.08);
+  border: 1px solid #F87171;
+  color: #F87171;
+  background: rgba(248, 113, 113, 0.08);
   font-weight: 600;
   border-radius: 14px;
   padding: 0.625rem 1rem;
@@ -108,32 +108,32 @@
   font-size: 0.875rem;
   font-family: inherit;
 }
-.btn-danger:hover { background: rgba(244, 63, 94, 0.15); }
+.btn-danger:hover { background: rgba(248, 113, 113, 0.15); }
 .btn-danger:active { transform: scale(0.97); }
 
 /* ─── Input ─── */
 .input-field {
   width: 100%;
-  background: #1a1b35;
-  border: 1.5px solid #3C4172;
+  background: #111321;
+  border: 1.5px solid #3C4378;
   border-radius: 14px;
   padding: 0.875rem 1rem;
-  color: #F5F5F8;
+  color: #F5F5FF;
   outline: none;
   transition: border-color 0.2s;
   font-size: 0.95rem;
   font-family: inherit;
 }
-.input-field::placeholder { color: #858BB8; }
-.input-field:focus { border-color: #737DE4; }
+.input-field::placeholder { color: #9298C2; }
+.input-field:focus { border-color: #6F78F0; }
 
 /* ─── Badges ─── */
 .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-success { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-warning { background: rgba(250,204,21,0.1); color: #facc15; border: 1px solid rgba(250,204,21,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-danger  { background: rgba(244,63,94,0.1); color: #f43f5e; border: 1px solid rgba(244,63,94,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-info    { background: rgba(115,125,228,0.12); color: #737DE4; border: 1px solid rgba(115,125,228,0.3); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-secondary { background: rgba(133,139,184,0.1); color: #858BB8; border: 1px solid rgba(133,139,184,0.2); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-success { background: rgba(54,211,153,0.1); color: #36D399; border: 1px solid rgba(54,211,153,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-warning { background: rgba(251,191,36,0.1); color: #FBBF24; border: 1px solid rgba(251,191,36,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-danger  { background: rgba(248,113,113,0.1); color: #F87171; border: 1px solid rgba(248,113,113,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-info    { background: rgba(111,120,240,0.12); color: #6F78F0; border: 1px solid rgba(111,120,240,0.3); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-secondary { background: rgba(146,152,194,0.1); color: #9298C2; border: 1px solid rgba(146,152,194,0.2); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
 
 /* ─── Rank Badge ─── */
 .rank-badge {
@@ -144,17 +144,17 @@
   border-radius: 9999px;
   font-size: 0.65rem;
   font-weight: 700;
-  background: rgba(115, 125, 228, 0.15);
-  color: #737DE4;
-  border: 1px solid rgba(115, 125, 228, 0.3);
+  background: rgba(111, 120, 240, 0.15);
+  color: #6F78F0;
+  border: 1px solid rgba(111, 120, 240, 0.3);
 }
 
 /* ─── Bottom Nav ─── */
 .bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background: #181927;
-  border-top: 1.5px solid #3C4172;
+  background: #111321;
+  border-top: 1.5px solid #3C4378;
   display: flex;
   z-index: 50;
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -169,7 +169,7 @@
   justify-content: center;
   gap: 4px;
   padding: 0;
-  color: #858BB8;
+  color: #9298C2;
   font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.2px;
@@ -179,12 +179,12 @@
   border: none;
   position: relative;
 }
-.nav-item.active { color: #737DE4; }
+.nav-item.active { color: #6F78F0; }
 
 /* ─── Page Container ─── */
 .page-container {
   min-height: 100vh;
-  background: #181927;
+  background: #111321;
   padding: 0 0 80px;
 }
 
@@ -192,23 +192,23 @@
 .section-title {
   font-size: 1rem;
   font-weight: 800;
-  color: #F5F5F8;
+  color: #F5F5FF;
   margin-bottom: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 /* ─── Utility ─── */
-.text-accent  { color: #737DE4; }
-.text-muted   { color: #858BB8; }
-.text-primary { color: #F5F5F8; }
+.text-accent  { color: #6F78F0; }
+.text-muted   { color: #9298C2; }
+.text-primary { color: #F5F5FF; }
 
-.bg-card  { background: #252642; }
-.bg-card2 { background: #1e1f3a; }
-.border-card { border: 1px solid #3C4172; }
+.bg-card  { background: #202440; }
+.bg-card2 { background: #1a1d36; }
+.border-card { border: 1px solid #3C4378; }
 
 .text-gradient {
-  background: linear-gradient(135deg, #737DE4, #9da5f0);
+  background: linear-gradient(135deg, #6F78F0, #858CF5);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -221,8 +221,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(115, 125, 228, 0.35); }
-  50%       { box-shadow: 0 0 0 8px rgba(115, 125, 228, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(111, 120, 240, 0.35); }
+  50%       { box-shadow: 0 0 0 8px rgba(111, 120, 240, 0); }
 }
 
 @keyframes shimmerAnim {
@@ -246,7 +246,7 @@
 
 .shimmer {
   animation: shimmerAnim 1.6s ease-in-out infinite;
-  background: linear-gradient(90deg, #252642 0%, #2e3057 50%, #252642 100%);
+  background: linear-gradient(90deg, #202440 0%, #2a2f55 50%, #202440 100%);
   background-size: 200% 100%;
 }
 
