@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { AdminController } from './admin.controller';
+import { AdminController, AdminJwtGuard } from './admin.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
@@ -10,12 +10,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: (configService.get<string>('JWT_EXPIRES_IN') || '15m') as any },
+        signOptions: { expiresIn: (configService.get<string>('JWT_EXPIRES_IN') || '24h') as any },
       }),
       inject: [ConfigService],
     }),
   ],
-  providers: [AdminService],
+  providers: [AdminService, AdminJwtGuard],
   controllers: [AdminController],
+  exports: [AdminJwtGuard],
 })
 export class AdminModule {}

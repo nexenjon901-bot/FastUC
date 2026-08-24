@@ -27,17 +27,30 @@ const STARS_PACKAGES = [
   { id: 4, stars: 500, price: 150000, label: '500 Stars' },
 ];
 
-const checkPubgId = (id: string): Promise<string | null> =>
-  new Promise(resolve => setTimeout(() => {
-    if (id.length >= 8 && id.startsWith('5')) resolve('Player_' + id.slice(-4));
-    else resolve(null);
-  }, 1200));
+// Real API validation functions - call backend endpoints
+const checkPubgId = async (id: string): Promise<{ valid: boolean; playerName: string | null; message: string }> => {
+  try {
+    const res = await api.get(`/admin/verify/pubg/${id.trim()}`);
+    return res.data;
+  } catch {
+    // Fallback client-side validation
+    const isValid = /^\d{8,12}$/.test(id.trim());
+    return { valid: isValid, playerName: isValid ? `Player_${id.slice(-4)}` : null, message: isValid ? '' : "PUBG ID 8-12 ta raqamdan iborat bo'lishi kerak" };
+  }
+};
 
-const checkTgUsername = (username: string): Promise<boolean> =>
-  new Promise(resolve => setTimeout(() => {
+const checkTgUsername = async (username: string): Promise<{ valid: boolean; message: string }> => {
+  try {
     const clean = username.replace('@', '').trim();
-    resolve(clean.length >= 4 && !clean.includes(' '));
-  }, 1200));
+    const res = await api.get(`/admin/verify/telegram/${clean}`);
+    return res.data;
+  } catch {
+    // Fallback client-side validation
+    const clean = username.replace('@', '').trim();
+    const isValid = /^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(clean);
+    return { valid: isValid, message: isValid ? '' : "Username formati noto'g'ri (kamida 4 belgi, @ bilan boshlang)" };
+  }
+};
 
 const AccountsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -95,9 +108,9 @@ const AccountsPage: React.FC = () => {
     triggerHaptic();
     if (!playerId) return;
     setIsCheckingUC(true); setUcPlayerName(null); setUcCheckError(null);
-    const name = await checkPubgId(playerId);
-    if (name) { setUcPlayerName(name); triggerHaptic('medium'); }
-    else { setUcCheckError("Bu ID topilmadi. Tekshirib qayta kiriting."); triggerHaptic('heavy'); }
+    const result = await checkPubgId(playerId);
+    if (result.valid) { setUcPlayerName(result.playerName); triggerHaptic('medium'); }
+    else { setUcCheckError(result.message || "Bu ID topilmadi. Tekshirib qayta kiriting."); triggerHaptic('heavy'); }
     setIsCheckingUC(false);
   };
 
@@ -105,24 +118,42 @@ const AccountsPage: React.FC = () => {
     triggerHaptic();
     if (!tgUsername) return;
     setIsCheckingStars(true); setStarsVerified(null); setStarsCheckError(null);
-    const found = await checkTgUsername(tgUsername);
-    if (found) { setStarsVerified(true); triggerHaptic('medium'); }
-    else { setStarsVerified(false); setStarsCheckError("Bu username topilmadi. @ bilan to'g'ri kiriting."); triggerHaptic('heavy'); }
+    const result = await checkTgUsername(tgUsername);
+    if (result.valid) { setStarsVerified(true); triggerHaptic('medium'); }
+    else { setStarsVerified(false); setStarsCheckError(result.message || "Bu username topilmadi."); triggerHaptic('heavy'); }
     setIsCheckingStars(false);
   };
 
-  const confirmBuy = () => {
+  const confirmBuy = async () => {
     if (buyLock.current) return;
     buyLock.current = true;
     setIsBuying(true);
-    setTimeout(() => {
+    try {
+      const type = buyType;
+      const pkg = type === 'uc' ? selectedUC : selectedStars;
+      const playInfo = type === 'uc' ? { playerId } : { tgUsername };
+      await api.post('/orders', {
+        type,
+        packageId: pkg?.id,
+        quantity: type === 'uc' ? ucQty : starsQty,
+        ...playInfo,
+      });
       triggerHaptic('heavy');
       const msg = 'Buyurtma qabul qilindi! Tez orada hisobingizga tushadi ✅';
       if (window.Telegram?.WebApp?.showAlert) window.Telegram.WebApp.showAlert(msg);
       else alert(msg);
       setSelectedUC(null); setSelectedStars(null); setBuyType(null);
-      setIsBuying(false); buyLock.current = false;
-    }, 1500);
+      // Refresh balance
+      api.get('/users/me').then(r => setBalance(r.data.balance || 0)).catch(() => {});
+    } catch (error: any) {
+      triggerHaptic('heavy');
+      const msg = error.response?.data?.message || 'Xatolik yuz berdi. Qayta urinib ko\'ring.';
+      if (window.Telegram?.WebApp?.showAlert) window.Telegram.WebApp.showAlert(msg);
+      else alert(msg);
+    } finally {
+      setIsBuying(false);
+      buyLock.current = false;
+    }
   };
 
   // ── Shared UC/Stars grid ──────────────────────────

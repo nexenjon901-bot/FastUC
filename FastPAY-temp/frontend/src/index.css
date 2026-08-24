@@ -252,3 +252,15 @@
 
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
+/* Scrollbarni yashirish (Lekin ishlashda davom etadi) */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+* {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+body {
+    overscroll-behavior-y: none; /* WebApp'da tepaga/pastga sakrashni oldini oladi */
+}
