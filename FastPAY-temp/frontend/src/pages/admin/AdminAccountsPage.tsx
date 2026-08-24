@@ -7,7 +7,7 @@ interface AdminAccountsPageProps { adminApi: any; }
 const AdminAccountsPage: React.FC<AdminAccountsPageProps> = ({ adminApi }) => {
   const [data, setData] = useState<any>({ accounts: [], total: 0, totalPages: 1 });
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
+  const [page] = useState(1);
   const [actionLoading, setActionLoading] = useState(false);
   
   // Add modal

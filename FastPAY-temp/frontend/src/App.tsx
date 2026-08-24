@@ -1,5 +1,5 @@
-﻿import React, { useEffect, Suspense, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+﻿import React, { useEffect, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import WebApp from '@twa-dev/sdk';
 import { AuthProvider } from './context/AuthContext';
@@ -81,7 +81,7 @@ const App: React.FC = () => {
 
               {/* Admin Routes */}
               <Route path="/admin/login" element={
-                <AdminLoginPage onLogin={(t, a) => { window.location.href = '/admin/dashboard'; }} />
+                <AdminLoginPage onLogin={() => { window.location.href = '/admin/dashboard'; }} />
               } />
               
               <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>

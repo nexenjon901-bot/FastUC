@@ -33,8 +33,8 @@ const AdminLayout: React.FC = () => {
       <div style={{
         position: 'fixed', top: 0, bottom: 0, left: sidebarOpen ? 0 : -280, width: 260,
         background: C.card, borderRight: `1px solid ${C.border}`, zIndex: 50, transition: 'left 0.3s',
-        display: 'flex', flexDirection: 'column',
-        '@media (min-width: 768px)': { position: 'sticky', left: 0 } as any
+        display: 'flex', flexDirection: 'column'
+        
       }}>
         <div style={{ padding: '24px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
