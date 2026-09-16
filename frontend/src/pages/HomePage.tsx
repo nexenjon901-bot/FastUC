@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../api';
 import Header from '../components/Header';
 
 const gameCategories = [
@@ -38,7 +36,6 @@ const packagesMock = {
 };
 
 const HomePage: React.FC = () => {
-  const navigate = useNavigate();
   const [balance, setBalance] = useState<number>(0);
   const [activeCategory, setActiveCategory] = useState('pubg');
 
