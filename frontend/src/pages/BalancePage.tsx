@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import Header from '../components/Header';
@@ -43,21 +43,21 @@ const BalancePage: React.FC = () => {
     {
       id: 'UZCARD_HUMO', label: 'UZCARD / HUMO', sub: 'Karta orqali',
       icon: (
-        <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-          <rect x="2" y="6" width="20" height="14" rx="3" stroke={C.accent} strokeWidth="2"/>
-          <path d="M2 10h20" stroke={C.accent} strokeWidth="2"/>
-          <rect x="5" y="13" width="5" height="2" rx="1" fill={C.accent}/>
-        </svg>
+        <img
+          src="/uzcard-humo.png"
+          alt="Uzcard / Humo"
+          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        />
       ),
     },
     {
       id: 'BANKOMAT', label: 'Bankomat', sub: 'Naqd pul orqali',
       icon: (
-        <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-          <rect x="3" y="4" width="18" height="16" rx="2" stroke={C.accent} strokeWidth="2"/>
-          <path d="M7 8h10M7 12h6M7 16h4" stroke={C.accent} strokeWidth="2" strokeLinecap="round"/>
-          <circle cx="17" cy="15" r="2" stroke={C.accent} strokeWidth="2"/>
-        </svg>
+        <img
+          src="/bankomat.png"
+          alt="Bankomat"
+          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        />
       ),
     },
   ];

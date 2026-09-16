@@ -30,8 +30,8 @@ export class BotService implements OnModuleInit {
       const webAppUrl = this.configService.get<string>('FRONTEND_URL') || 'https://fastpay-web.vercel.app';
       
       const text = `<b>👋 Assalomu alaykum, ${name}!</b>\n\n` +
-                   `<b>🎮 fastPAY</b> — <b>ishonchli va tezkor PUBG Mobile akkauntlar do'koniga xush kelibsiz.</b>\n\n` +
-                   `<b>🔥 Bizda eng zo'r akkauntlar, mifik kolleksiyalar va arzon narxlar mavjud.</b>\n\n` +
+                   `<b>🎮 FastUC</b> — <b>ishonchli va tezkor o'yin valyutasi (UC, Gold, CP, va h.k) do'koniga xush kelibsiz.</b>\n\n` +
+                   `<b>🔥 Biz orqali PUBG, Standoff 2, CoD kabi o'yinlarga hamyonbop narxlarda tezkor xaridni amalga oshiring.</b>\n\n` +
                    `<b>👇 Ilovani ochish uchun quyidagi tugmani bosing!</b>`;
                    
       this.bot.sendMessage(chatId, text, {

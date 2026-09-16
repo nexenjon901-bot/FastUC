@@ -8,13 +8,14 @@ export default {
     extend: {
       colors: {
         bg: {
-          DEFAULT: '#0f111a',
-          card: '#16192b',
-          card2: '#1d2138',
+          DEFAULT: '#1c1e22',
+          card: '#25272e',
+          card2: '#2a2d35',
         },
         accent: {
           indigo: '#5a67d8',
           violet: '#7c3aed',
+          purple: '#8a2be2'
         },
         success: '#10b981',
         warning: '#facc15',
@@ -32,8 +33,8 @@ export default {
         '3xl': '1.5rem',
       },
       backgroundImage: {
-        'accent-gradient': 'linear-gradient(135deg, #6366f1, #7c3aed)',
-        'card-gradient': 'linear-gradient(145deg, #16192b, #1d2138)',
+        'accent-gradient': 'linear-gradient(135deg, #7c3aed, #8a2be2)',
+        'card-gradient': 'linear-gradient(145deg, #25272e, #2a2d35)',
       },
     },
   },

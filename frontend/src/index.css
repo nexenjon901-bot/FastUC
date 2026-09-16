@@ -3,17 +3,17 @@
 
 /* ─── FastUC Design Tokens ─── */
 @theme {
-  --color-bg:          #111321;
-  --color-bg-card:     #202440;
-  --color-bg-card2:    #1a1d36;
-  --color-border:      #3C4378;
-  --color-accent:      #6F78F0;
-  --color-accent-light: #858CF5;
-  --color-text:        #F5F5FF;
-  --color-text-muted:  #9298C2;
-  --color-success:     #36D399;
-  --color-danger:      #F87171;
-  --color-warning:     #FBBF24;
+  --color-bg:          #1c1e22;
+  --color-bg-card:     #25272e;
+  --color-bg-card2:    #2a2d35;
+  --color-border:      #333742;
+  --color-accent:      #8a2be2;
+  --color-accent-light: #9d4edd;
+  --color-text:        #f8fafc;
+  --color-text-muted:  #94a3b8;
+  --color-success:     #10b981;
+  --color-danger:      #f43f5e;
+  --color-warning:     #facc15;
 
   --font-sans: 'Outfit', system-ui, sans-serif;
   --radius-card: 22px;
@@ -36,28 +36,28 @@
   }
 
   body {
-    background-color: #111321;
-    color: #F5F5FF;
+    background-color: #1c1e22;
+    color: #f8fafc;
     font-family: 'Outfit', system-ui, sans-serif;
   }
 
   ::-webkit-scrollbar { width: 3px; }
-  ::-webkit-scrollbar-track { background: #202440; }
-  ::-webkit-scrollbar-thumb { background: #6F78F0; border-radius: 2px; }
+  ::-webkit-scrollbar-track { background: #25272e; }
+  ::-webkit-scrollbar-thumb { background: #8a2be2; border-radius: 2px; }
 }
 
 /* ─── Card ─── */
 .card {
-  background: #202440;
+  background: #25272e;
   border-radius: 22px;
   padding: 18px;
-  border: 1px solid #3C4378;
+  border: 1px solid #333742;
 }
 
 /* ─── Buttons ─── */
 .btn-primary {
-  background: #6F78F0;
-  color: #F5F5FF;
+  background: #8a2be2;
+  color: #f8fafc;
   font-weight: 700;
   border-radius: 16px;
   padding: 0.875rem 1.5rem;
@@ -129,11 +129,11 @@
 
 /* ─── Badges ─── */
 .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-success { background: rgba(54,211,153,0.1); color: #36D399; border: 1px solid rgba(54,211,153,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-warning { background: rgba(251,191,36,0.1); color: #FBBF24; border: 1px solid rgba(251,191,36,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-danger  { background: rgba(248,113,113,0.1); color: #F87171; border: 1px solid rgba(248,113,113,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-info    { background: rgba(111,120,240,0.12); color: #6F78F0; border: 1px solid rgba(111,120,240,0.3); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-secondary { background: rgba(146,152,194,0.1); color: #9298C2; border: 1px solid rgba(146,152,194,0.2); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-success { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-warning { background: rgba(250,204,21,0.1); color: #facc15; border: 1px solid rgba(250,204,21,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-danger  { background: rgba(244,63,94,0.1); color: #f43f5e; border: 1px solid rgba(244,63,94,0.25); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-info    { background: rgba(138,43,226,0.12); color: #8a2be2; border: 1px solid rgba(138,43,226,0.3); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-secondary { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
 
 /* ─── Rank Badge ─── */
 .rank-badge {
